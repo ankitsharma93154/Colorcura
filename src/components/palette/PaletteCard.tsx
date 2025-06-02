@@ -37,6 +37,7 @@ const PaletteCard: React.FC<PaletteCardProps> = ({ palette, onLike }) => {
       <Link 
         to={`/palette/${palette.id}`}
         className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+        aria-label={`View palette ${palette.name}`}
       >
         <div className="h-60 w-full flex flex-col">
           {palette.hex_codes.map((color, index) => {
