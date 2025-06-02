@@ -53,12 +53,12 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
   };
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ">
-      <h3 className="text-xl font-bold mb-4 ">Gradient Generator</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+      <h3 className="text-xl font-bold mb-4">Gradient Generator</h3>
       
-      {/* Main horizontal layout */}
-      <div className="flex gap-6">
-        {/* Left side - Preview and CSS */}
+      {/* Responsive layout: vertical on mobile, horizontal on desktop */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Preview and CSS section */}
         <div className="flex-1 min-w-0">
           <div 
             className="h-20 w-full rounded-lg mb-3 flex items-end justify-end p-3"
@@ -82,18 +82,18 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
           </div>
         </div>
         
-        {/* Right side - Controls */}
-        <div className="flex gap-4 items-start">
+        {/* Controls section */}
+        <div className="flex flex-col sm:flex-row lg:flex-row gap-4 lg:items-start">
           {/* Gradient Type */}
           <div className="min-w-fit">
             <label className="text-sm font-medium mb-2 block">Type</label>
-            <div className="flex flex-col space-y-1">
+            <div className="flex sm:flex-col lg:flex-col space-x-1 sm:space-x-0 sm:space-y-1 lg:space-x-0 lg:space-y-1">
               {(['linear', 'radial', 'conic'] as GradientType[]).map(type => (
                 <button
                   key={type}
                   onClick={() => setGradientType(type)}
                   className={`
-                    px-3 py-1.5 rounded-md text-sm transition-colors whitespace-nowrap
+                    px-3 py-1.5 rounded-md text-sm transition-colors whitespace-nowrap flex-1 sm:flex-none lg:flex-none
                     ${gradientType === type ? 
                       'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 
                       'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -106,8 +106,8 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
             </div>
           </div>
           
-          {/* Angle and Colors Stacked */}
-          <div className="space-y-4">
+          {/* Angle and Colors section */}
+          <div className="space-y-4 flex-1 sm:flex-none lg:flex-none">
             {/* Angle Control */}
             {(gradientType === 'linear' || gradientType === 'conic') && (
               <div>
@@ -129,7 +129,7 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
                     max="360"
                     value={angle}
                     onChange={(e) => setAngle(parseInt(e.target.value))}
-                    className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    className="flex-1 sm:w-32 lg:w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
               </div>
@@ -138,7 +138,7 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
             {/* Colors */}
             <div>
               <label className="text-sm font-medium mb-2 block">Colors (min 2)</label>
-              <div className="grid grid-cols-4 gap-2 max-w-32">
+              <div className="grid grid-cols-6 sm:grid-cols-4 lg:grid-cols-4 gap-2 max-w-none sm:max-w-32 lg:max-w-32">
                 {colors.map((color, index) => (
                   <button
                     key={index}

@@ -45,7 +45,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
               title="Click to change Text on Primary role">
           <Palette className="w-7 h-7" style={{ color: accent }} onClick={(e) => { e.stopPropagation(); onElementClick('accent'); }}/>
           <div className="font-bold text-xl tracking-tight">
-            ColorVerse
+            Colorcura
           </div>
         </div>
         <nav className="flex items-center space-x-6">
@@ -236,7 +236,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
         title="Click to change Primary role"
       >
         <div className="flex justify-center items-center space-x-4">
-          <span>&copy; {new Date().getFullYear()} ColorVerse</span>
+          <span>&copy; {new Date().getFullYear()} Colorcura</span>
           <span className="hover:text-opacity-100 cursor-pointer transition-opacity" style={{ color: textOnPrimary + 'A0' }} onClick={(e) => { e.stopPropagation(); onElementClick('textOnPrimary'); }} title="Click to change Text on Primary role">Privacy Policy</span>
           <span className="hover:text-opacity-100 cursor-pointer transition-opacity" style={{ color: textOnPrimary + 'A0' }} onClick={(e) => { e.stopPropagation(); onElementClick('textOnPrimary'); }} title="Click to change Text on Primary role">Terms of Service</span>
         </div>

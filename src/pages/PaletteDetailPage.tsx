@@ -357,7 +357,7 @@ const PaletteDetailPage: React.FC = () => {
                       title={`Click to copy ${hex}`}
                     >
                       <div
-                        className="h-16 relative transition-all duration-200 ease-out group-hover:scale-y-105"
+                        className="h-16 relative transition-all duration-200 ease-out group-hover:scale-x-105"
                         style={{ backgroundColor: color }}
                       />
                       <div className="mt-1">
@@ -418,26 +418,43 @@ const PaletteDetailPage: React.FC = () => {
               UI Preview
             </h2>
              {/* Restored Undo/Redo Controls */}
-            <div className="flex space-x-1">
-              <button
-                onClick={handleUndo}
-                disabled={!canUndo}
-                className={`p-1.5 rounded-md transition-colors ${canUndo ? 'text-gray-600 hover:bg-gray-100 hover:text-indigo-600' : 'text-gray-300 cursor-not-allowed'}`}
-                aria-label="Undo Role Assignment Change"
-                title="Undo Role Assignment Change"
-              >
-                <Undo className="h-4 w-4" />
-              </button>
-              <button
-                onClick={handleRedo}
-                disabled={!canRedo}
-                className={`p-1.5 rounded-md transition-colors ${canRedo ? 'text-gray-600 hover:bg-gray-100 hover:text-indigo-600' : 'text-gray-300 cursor-not-allowed'}`}
-                aria-label="Redo Role Assignment Change"
-                title="Redo Role Assignment Change"
-              >
-                <Redo className="h-4 w-4" />
-              </button>
-            </div>
+            <div className="flex space-x-2">
+  <button
+    onClick={handleUndo}
+    disabled={!canUndo}
+    className={`
+      p-2.5 rounded-lg border transition-all duration-200 font-medium text-sm
+      ${canUndo 
+        ? 'bg-white hover:bg-indigo-50 border-gray-300 hover:border-indigo-300 text-gray-700 hover:text-indigo-700 shadow-sm hover:shadow-md transform hover:-translate-y-0.5' 
+        : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+      }
+    `}
+    aria-label="Undo Role Assignment Change"
+    title="Undo Role Assignment Change"
+  >
+    <div className="flex items-center space-x-1.5">
+      <Undo className="h-4 w-4" />
+    </div>
+  </button>
+  <button
+    onClick={handleRedo}
+    disabled={!canRedo}
+    className={`
+      p-2.5 rounded-lg border transition-all duration-200 font-medium text-sm
+      ${canRedo 
+        ? 'bg-white hover:bg-indigo-50 border-gray-300 hover:border-indigo-300 text-gray-700 hover:text-indigo-700 shadow-sm hover:shadow-md transform hover:-translate-y-0.5' 
+        : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+      }
+    `}
+    aria-label="Redo Role Assignment Change"
+    title="Redo Role Assignment Change"
+  >
+    <div className="flex items-center space-x-1.5">
+      <Redo className="h-4 w-4" />
+
+    </div>
+  </button>
+</div>
           </div>
           {/* Full width container for the mockup */}
           <div className="w-full max-w-none">

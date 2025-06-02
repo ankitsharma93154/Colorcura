@@ -10,7 +10,7 @@ const AboutContactPage: React.FC = () => {
             <div className="flex justify-center mb-6">
                 <div className="relative">
                   <img
-            src="/colorcura_icon.png"
+            src="/colorcura-icon2.png"
             alt="Colorcura Logo"
             className="h-20 w-20 object-contain drop-shadow-lg"
             />

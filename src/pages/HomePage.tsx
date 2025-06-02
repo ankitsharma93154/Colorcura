@@ -78,16 +78,23 @@ const HomePage: React.FC = () => {
       );
     }
 
-    // Sort
-    processedPalettes.sort((a, b) => {
+    // FIX: Sort a *copy* of the array to avoid mutating state directly
+    const sortedPalettes = [...processedPalettes].sort((a, b) => { // Create copy with spread syntax [...]
       if (activeSort === 'trending') {
-        return b.likes_count - a.likes_count;
-      } else {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        // Ensure likes_count exists, default to 0 if not
+        const likesA = a.likes_count ?? 0;
+        const likesB = b.likes_count ?? 0;
+        return likesB - likesA;
+      } else { // newest
+        // Ensure created_at exists and is valid, fallback to 0 timestamp if not
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        // Handle potential NaN from invalid dates
+        return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
       }
     });
 
-    return processedPalettes;
+    return sortedPalettes; // Return the newly sorted copy
   }, [allPalettes, activeFilter, activeSort, searchQuery]);
 
   // Palettes to actually display based on infinite scroll count
@@ -146,8 +153,8 @@ const HomePage: React.FC = () => {
         return {
           ...palette,
           likes_count: isCurrentlyLiked
-            ? palette.likes_count - 1
-            : palette.likes_count + 1
+            ? (palette.likes_count ?? 0) - 1
+            : (palette.likes_count ?? 0) + 1
         };
       }
       return palette;
@@ -158,6 +165,7 @@ const HomePage: React.FC = () => {
 
   // Helper function to capitalize first letter
   const capitalizeFirstLetter = (str: string) => {
+    if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
@@ -165,9 +173,14 @@ const HomePage: React.FC = () => {
   const allTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
     allPalettes.forEach(palette => {
-      palette.tags.forEach(tag => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-      });
+      // Ensure tags is an array before iterating
+      if (Array.isArray(palette.tags)) {
+          palette.tags.forEach(tag => {
+            if (tag) { // Ensure tag is not null/undefined
+                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            }
+          });
+      }
     });
     return Object.entries(tagCounts)
       .sort(([, a], [, b]) => b - a)
@@ -179,7 +192,8 @@ const HomePage: React.FC = () => {
 
   if (loading && allPalettes.length === 0) { // Show initial loading state only
     return (
-      <div className="px-4 py-8 bg-white min-h-screen">
+      // STYLE: Apply bg-gray-50 to loading state background
+      <div className="px-4 py-8 bg-gray-50 min-h-screen">
         <div className="text-center py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">Loading palettes...</p>
@@ -190,7 +204,8 @@ const HomePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="px-4 py-8 bg-white">
+      // STYLE: Apply bg-gray-50 to error state background
+      <div className="px-4 py-8 bg-gray-50 min-h-screen">
         <div className="text-center py-16">
           <p className="text-lg text-red-600 mb-4">{error}</p>
           <button
@@ -205,11 +220,13 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    // STYLE: Change main background to bg-gray-50
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Main Content Area */}
       <div className="flex flex-col md:flex-row flex-1">
         {/* Left Sidebar - Tags - Hidden on mobile */}
-        <div className="hidden md:block w-44 border-r border-gray-200 bg-white">
+        {/* STYLE: Update border to border-gray-300, keep bg-white */}
+        <div className="hidden md:block w-44 border-r border-gray-300 bg-white">
           <div
             className="sticky top-0 p-4 h-screen overflow-y-auto"
             style={{
@@ -217,15 +234,16 @@ const HomePage: React.FC = () => {
               scrollbarWidth: 'none'
             }}
           >
-            <h2 className="text-lg font-semibold mb-4">Tags</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Tags</h2>
             <div className="space-y-2">
               <button
                 onClick={() => setActiveFilter(null)}
                 className={`
-                  block w-full text-left px-3 py-2 rounded-md
+                  block w-full text-left px-3 py-2 rounded-md text-sm transition-colors
+                  /* STYLE: Update active state */
                   ${!activeFilter ?
-                    'bg-indigo-100 text-indigo-700' :
-                    'hover:bg-gray-100 text-gray-700'}
+                    'bg-indigo-100 text-indigo-800 font-medium' :
+                    'text-gray-700 hover:bg-gray-100'}
                 `}
               >
                 All Palettes
@@ -236,10 +254,11 @@ const HomePage: React.FC = () => {
                   key={tag}
                   onClick={() => setActiveFilter(tag)}
                   className={`
-                    block w-full text-left px-3 py-2 rounded-md
+                    block w-full text-left px-3 py-2 rounded-md text-sm transition-colors
+                    /* STYLE: Update active state */
                     ${activeFilter === tag ?
-                      'bg-indigo-100 text-indigo-700' :
-                      'hover:bg-gray-100 text-gray-700'}
+                      'bg-indigo-100 text-indigo-800 font-medium' :
+                      'text-gray-700 hover:bg-gray-100'}
                   `}
                 >
                   {capitalizeFirstLetter(tag)}
@@ -250,7 +269,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-4"> {/* Added pb-20 for mobile bottom bar space */}
+        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-4 bg-white"> {/* Added pb-20 for mobile bottom bar space */}
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative w-full">
@@ -262,7 +281,8 @@ const HomePage: React.FC = () => {
                 placeholder="Search by tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                // STYLE: Keep search bar white for contrast, add shadow
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
               />
               {searchQuery && (
                 <button
@@ -288,10 +308,11 @@ const HomePage: React.FC = () => {
               <button
                 onClick={() => setActiveSort('trending')}
                 className={`
-                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md
+                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md transition-colors
+                  /* STYLE: Update active/inactive states */
                   ${activeSort === 'trending' ?
-                    'bg-indigo-100 text-indigo-700' :
-                    'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                    'bg-indigo-600 text-white shadow-sm' :
+                    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'}
                 `}
               >
                 <TrendingUp className="h-4 w-4" />
@@ -301,10 +322,11 @@ const HomePage: React.FC = () => {
               <button
                 onClick={() => setActiveSort('newest')}
                 className={`
-                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md
+                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md transition-colors
+                  /* STYLE: Update active/inactive states */
                   ${activeSort === 'newest' ?
-                    'bg-indigo-100 text-indigo-700' :
-                    'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                    'bg-indigo-600 text-white shadow-sm' :
+                    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'}
                 `}
               >
                 <Sparkles className="h-4 w-4" />
@@ -368,30 +390,31 @@ const HomePage: React.FC = () => {
         </main>
 
         {/* Right Sidebar - Heading and Promo - Hidden on mobile */}
-        <aside className="hidden lg:block w-72 border-l border-gray-200 bg-white">
+        {/* STYLE: Update border to border-gray-300, keep bg-white */}
+        <aside className="hidden lg:block w-72 border-l border-gray-300 bg-white">
           <div className="sticky top-0 px-4 py-8 h-screen ">
-            <h1 className="text-2xl font-bold mb-2 ">Curated Color Palettes</h1>
+            <h1 className="text-2xl font-bold mb-2 text-gray-800">Curated Color Palettes</h1>
             <p className="text-gray-600">
               Explore thoughtfully curated 4-color palettes designed for real-world UI use.
             </p>
 
-            {/* Promo Section */}
+            {/* Promo Section - Keep gradient, update text/inner box styles */}
             <div className="mt-8 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl p-6">
-              <h2 className="text-lg font-bold mb-3">Design with Confidence</h2>
-              <p className="text-gray-700 mb-4 text-sm">
+              <h2 className="text-lg font-bold mb-3 text-indigo-900">Design with Confidence</h2>
+              <p className="text-indigo-800 mb-4 text-sm">
                 ColorCura helps you visualize and experiment with color combinations that truly work — no guesswork needed.
               </p>
               <div className="space-y-2">
-                <div className="px-3 py-1.5 bg-white rounded-md shadow-sm text-sm">
+                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
                   <span className="font-medium">4 colors</span> per palette for harmony
                 </div>
-                <div className="px-3 py-1.5 bg-white rounded-md shadow-sm text-sm">
+                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
                   <span className="font-medium">Smart</span> role suggestions (Heading, Accent, Background)
                 </div>
-                <div className="px-3 py-1.5 bg-white rounded-md shadow-sm text-sm">
+                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
                   <span className="font-medium">Live</span> UI mockup previews
                 </div>
-                <div className="px-3 py-1.5 bg-white rounded-md shadow-sm text-sm">
+                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
                   <span className="font-medium">Gradient</span> generator with CSS export
                 </div>
               </div>
@@ -401,16 +424,18 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Mobile Bottom Bar - Tags - Sticky */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white shadow-lg z-10">
+      {/* STYLE: Update background to bg-gray-50, border-gray-300 */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 border-t border-gray-300 bg-gray-50 shadow-lg z-10">
         <div className="overflow-x-auto">
           <div className="flex space-x-2 min-w-max">
             <button
               onClick={() => setActiveFilter(null)}
               className={`
-                px-3 py-2 rounded-md text-sm whitespace-nowrap
+                px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors
+                /* STYLE: Update active state */
                 ${!activeFilter ?
-                  'bg-indigo-100 text-indigo-700' :
-                  'hover:bg-gray-100 text-gray-700'}
+                  'bg-indigo-100 text-indigo-800 font-medium' :
+                  'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}
               `}
             >
               All
@@ -421,10 +446,11 @@ const HomePage: React.FC = () => {
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
                 className={`
-                  px-3 py-2 rounded-md text-sm whitespace-nowrap
+                  px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors
+                  /* STYLE: Update active state */
                   ${activeFilter === tag ?
-                    'bg-indigo-100 text-indigo-700' :
-                    'hover:bg-gray-100 text-gray-700'}
+                    'bg-indigo-100 text-indigo-800 font-medium' :
+                    'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}
                 `}
               >
                 {capitalizeFirstLetter(tag)}
