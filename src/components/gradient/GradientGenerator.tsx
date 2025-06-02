@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Sliders, RefreshCw, Copy, Check } from 'lucide-react';
 import { generateGradient } from '../../utils/colorUtils';
 
@@ -160,4 +160,4 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
   );
 };
 
-export default GradientGenerator;
+export default memo(GradientGenerator);
