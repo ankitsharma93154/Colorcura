@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { ColorPalette } from '../../data/mockData';
@@ -104,4 +104,4 @@ const PaletteCard: React.FC<PaletteCardProps> = ({ palette, onLike }) => {
   );
 };
 
-export default memo(PaletteCard);
+export default PaletteCard;
