@@ -45,7 +45,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
               title="Click to change Text on Primary role">
           <Palette className="w-7 h-7" style={{ color: accent }} onClick={(e) => { e.stopPropagation(); onElementClick('accent'); }}/>
           <div className="font-bold text-xl tracking-tight">
-            Colorcura
+            ColorCura
           </div>
         </div>
         <nav className="flex items-center space-x-6">

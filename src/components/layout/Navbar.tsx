@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
           alt="Colorcura Logo"
           className="h-8 w-8 object-contain"
           />
-           <span className="text-xl font-bold">Colorcura</span>
+           <span className="text-xl font-bold">ColorCura</span>
         </Link>
         
         <nav className="flex items-center space-x-6">

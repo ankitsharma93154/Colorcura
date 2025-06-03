@@ -16,7 +16,7 @@ const AboutContactPage: React.FC = () => {
             />
                 </div>
             </div>
-            <h1 className="text-5xl font-bold mb-4 text-gray-900 ">Colorcura</h1>
+            <h1 className="text-5xl font-bold mb-4 text-gray-900 ">ColorCura</h1>
             <p className="text-xl text-gray-600 font-medium">
               Visualize Roles. Preview UIs. Pick Better Colors.
             </p>
