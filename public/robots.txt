@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.colorcura.site/sitemap.xml
+Sitemap: https://www.colorcura.site/sitemaps.xml
