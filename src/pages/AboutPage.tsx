@@ -241,30 +241,33 @@ const AboutContactPage: React.FC = () => {
                 Have feedback, ideas, or just want to say hi? Feel free to reach out:
               </p>
               
-              <div className="flex justify-center gap-8">
+              <div className="flex flex-col sm:flex-row justify-center gap-6">
                 <a 
                   href="mailto:hello.colorcura@gmail.com" 
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                  className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
                 >
-                  <Mail className="h-8 w-8 mx-auto text-indigo-600 group-hover:text-indigo-700 transition-colors" />
+                  <Mail className="h-8 w-8 text-indigo-600 group-hover:text-indigo-700 transition-colors mb-2" />
+                  <span className="text-sm font-medium text-gray-700">Email</span>
                 </a>
                 
                 <a 
                   href="https://twitter.com/AnkitKumar11451" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                  className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
                 >
-                  <Twitter className="h-8 w-8 mx-auto text-indigo-600 group-hover:text-indigo-700 transition-colors" />
+                  <Twitter className="h-8 w-8 text-indigo-600 group-hover:text-indigo-700 transition-colors mb-2" />
+                  <span className="text-sm font-medium text-gray-700">Twitter</span>
                 </a>
                 
                 <a 
                   href="https://www.linkedin.com/in/ankit-kumar-sharma-99698028a/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                  className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
                 >
-                  <Linkedin className="h-8 w-8 mx-auto text-indigo-600 group-hover:text-indigo-700 transition-colors" />
+                  <Linkedin className="h-8 w-8 text-indigo-600 group-hover:text-indigo-700 transition-colors mb-2" />
+                  <span className="text-sm font-medium text-gray-700">LinkedIn</span>
                 </a>
               </div>
               
