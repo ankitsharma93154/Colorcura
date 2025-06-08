@@ -53,7 +53,7 @@ const GradientGenerator: React.FC<GradientGeneratorProps> = ({ colors }) => {
   };
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
       <h3 className="text-xl font-bold mb-4">Gradient Generator</h3>
       
       {/* Responsive layout: vertical on mobile, horizontal on desktop */}

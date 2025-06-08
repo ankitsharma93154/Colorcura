@@ -10,10 +10,7 @@ import MockupPreview from '../components/mockup/MockupPreview';
 import { assignColorRolesForFour, getSuggestedUsage, ColorRoles } from '../utils/colorUtils';
 import GradientGenerator from '../components/gradient/GradientGenerator';
 
-// Assuming ColorPicker exists at this path as per original file
-// If not, this will cause an error. User confirmed they want original functionality.
-// import ColorPicker from '../components/common/ColorPicker'; 
-// ^^^ Let's use the simple modal from the original file instead of an external component
+
 
 const initialColorRoles: ColorRoles = {
   background: '#ffffff',
@@ -269,13 +266,13 @@ const PaletteDetailPage: React.FC = () => {
   const validCreationDate = creationDateTimestamp && !isNaN(creationDateTimestamp) ? creationDateTimestamp : undefined;
 
   return (
-    <div className="px-4 py-8 min-h-screen bg-white text-gray-900">
+    <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 text-gray-900">
       <div className="container mx-auto space-y-8">
         {/* Back Button */}
         <div className="mb-4">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
+            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors "
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             <span>Back to palettes</span>
@@ -285,7 +282,7 @@ const PaletteDetailPage: React.FC = () => {
         {/* Section 1 (New): Combined Palette Info & Gradient Generator (Side-by-Side) */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Combined Palette Info Section */}
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col h-full">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-full">
             {/* Top part: Name and Actions */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -338,7 +335,7 @@ const PaletteDetailPage: React.FC = () => {
 
             {/* Middle part: Color Strip with details - Restored hover effect */}
             <div className="p-4 flex-grow">
-              <div className="flex w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm mb-2">
+              <div className="flex w-full overflow-hidden rounded-xl border border-gray-200 shadow-sm mb-2">
                  {palette.hex_codes.slice(0, 4).map((color, index) => {
                   const hex = color.toUpperCase();
                   let rgb = 'rgb(N/A)';
@@ -388,8 +385,8 @@ const PaletteDetailPage: React.FC = () => {
         </section>
 
         {/* Section 2: Assigned Color Roles - Now clickable to edit */}
-        <section className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800">Assigned Color Roles</h2>
+        <section className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Assigned Color Roles</h2>
           <p className="text-sm text-gray-600 mb-4">Click a role's color swatch below to assign a different color using the palette colors, black, or white. These roles are used in the UI Preview.</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
             {displayRoles.map((role) => {
@@ -411,9 +408,9 @@ const PaletteDetailPage: React.FC = () => {
         </section>
 
         {/* Section 3: UI Mockup Preview (Full Width) - Now interactive */}
-        <section className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 -mx-4 sm:mx-0">
+        <section className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 -mx-4 sm:mx-0">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+            <h2 className="text-xl  text-gray-800 flex items-center font-semibold ">
               <Palette className="h-5 w-5 mr-2 text-indigo-600" />
               UI Preview
             </h2>

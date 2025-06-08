@@ -192,11 +192,17 @@ const HomePage: React.FC = () => {
 
   if (loading && allPalettes.length === 0) { // Show initial loading state only
     return (
-      // STYLE: Apply bg-gray-50 to loading state background
-      <div className="px-4 py-8 bg-gray-50 min-h-screen">
-        <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">Loading palettes...</p>
+      <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-24 h-24 bg-gradient-to-br from-pink-400/20 to-orange-500/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        
+        <div className="relative z-10 text-center py-16">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto mb-6" style={{ 
+            mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
+            WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
+          }}></div>
+          <p className="text-xl font-medium bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">Loading palettes...</p>
         </div>
       </div>
     );
@@ -204,13 +210,15 @@ const HomePage: React.FC = () => {
 
   if (error) {
     return (
-      // STYLE: Apply bg-gray-50 to error state background
-      <div className="px-4 py-8 bg-gray-50 min-h-screen">
-        <div className="text-center py-16">
-          <p className="text-lg text-red-600 mb-4">{error}</p>
+      <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-red-400/20 to-orange-500/20 rounded-full blur-3xl animate-pulse"></div>
+        
+        <div className="relative z-10 text-center py-16">
+          <p className="text-xl text-red-600 mb-6 font-medium">{error}</p>
           <button
             onClick={() => window.location.reload()} // Simple reload for error state
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
           >
             Try Again
           </button>
@@ -220,60 +228,90 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    // STYLE: Change main background to bg-gray-50
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Main Content Area */}
-      <div className="flex flex-col md:flex-row flex-1">
-        {/* Left Sidebar - Tags - Hidden on mobile */}
-        {/* STYLE: Update border to border-gray-300, keep bg-white */}
-        <div className="hidden md:block w-44 border-r border-gray-300 bg-white">
-          <div
-            className="sticky top-0 p-4 h-screen overflow-y-auto"
-            style={{
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none'
-            }}
-          >
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">Tags</h2>
-            <div className="space-y-2">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="fixed bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-400/10 to-orange-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+      
+      {/* Fixed Left Sidebar - Tags (Desktop) */}
+      <div className="hidden md:block w-48 h-screen fixed left-0 top-18 border-r border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
+        <div className="p-6 h-full overflow-y-auto scrollbar-hide">
+          <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Tags</h2>
+          <div className="space-y-2">
+            <button
+              onClick={() => setActiveFilter(null)}
+              className={`
+                block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm border
+                ${!activeFilter ?
+                  'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg border-indigo-300 scale-105' :
+                  'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow-md'}
+              `}
+            >
+              All Palettes
+            </button>
+
+            {allTags.map(tag => (
               <button
-                onClick={() => setActiveFilter(null)}
+                key={tag}
+                onClick={() => setActiveFilter(tag)}
                 className={`
-                  block w-full text-left px-3 py-2 rounded-md text-sm transition-colors
-                  /* STYLE: Update active state */
-                  ${!activeFilter ?
-                    'bg-indigo-100 text-indigo-800 font-medium' :
-                    'text-gray-700 hover:bg-gray-100'}
+                  block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm border
+                  ${activeFilter === tag ?
+                    'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg border-indigo-300 scale-105' :
+                    'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow-md'}
                 `}
               >
-                All Palettes
+                {capitalizeFirstLetter(tag)}
               </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              {allTags.map(tag => (
-                <button
-                  key={tag}
-                  onClick={() => setActiveFilter(tag)}
-                  className={`
-                    block w-full text-left px-3 py-2 rounded-md text-sm transition-colors
-                    /* STYLE: Update active state */
-                    ${activeFilter === tag ?
-                      'bg-indigo-100 text-indigo-800 font-medium' :
-                      'text-gray-700 hover:bg-gray-100'}
-                  `}
-                >
-                  {capitalizeFirstLetter(tag)}
-                </button>
-              ))}
+      {/* Fixed Right Sidebar (Desktop) */}
+      <aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
+        <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
+          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+            Curated Color Palettes
+          </h1>
+          <p className="text-gray-600 mb-8 leading-relaxed">
+            Explore thoughtfully curated 4-color palettes designed for real-world UI use.
+          </p>
+
+          {/* Enhanced Promo Section */}
+          <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
+            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
+              Design with Confidence
+            </h2>
+            <p className="text-indigo-800 mb-6 text-sm leading-relaxed">
+              ColorCura helps you visualize how colors work together in real interfaces. No more guessing – see your palette in action before you commit.
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center text-sm text-indigo-700">
+                <div className="w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></div>
+                <span>Live UI previews</span>
+              </div>
+              <div className="flex items-center text-sm text-indigo-700">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></div>
+                <span>Smart color role suggestions</span>
+              </div>
+              <div className="flex items-center text-sm text-indigo-700">
+                <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></div>
+                <span>Gradient generator</span>
+              </div>
             </div>
           </div>
         </div>
+      </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-4 bg-white"> {/* Added pb-20 for mobile bottom bar space */}
-          {/* Search Bar */}
+      {/* Main Content - with proper margins for sidebars */}
+      <main className="flex-1 md:ml-48 lg:mr-80 min-h-screen overflow-y-auto bg-white/40 backdrop-blur-sm">
+        <div className="p-6 md:p-8 pb-32 md:pb-6">
+          {/* Enhanced Search Bar */}
           <div className="mb-6">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="relative w-full max-w-3xl mx-auto">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
@@ -281,38 +319,36 @@ const HomePage: React.FC = () => {
                 placeholder="Search by tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                // STYLE: Keep search bar white for contrast, add shadow
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                className="block w-full pl-12 pr-4 py-4 border border-white/30 rounded-2xl leading-5 bg-white/80 backdrop-blur-lg placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 shadow-lg text-lg transition-all duration-300 hover:shadow-xl"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  <span className="text-gray-400 hover:text-gray-600">×</span>
+                  <span className="text-xl">×</span>
                 </button>
               )}
             </div>
 
-            {/* Search Results Info */}
+            {/* Enhanced Search Results Info */}
             {searchQuery && (
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-4 text-center text-sm text-gray-600 font-medium">
                 {filteredAndSortedPalettes.length} palette{filteredAndSortedPalettes.length !== 1 ? 's' : ''} found for "{searchQuery}"
               </p>
             )}
           </div>
 
-          {/* Sort Controls */}
+          {/* Enhanced Sort Controls */}
           <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setActiveSort('trending')}
                 className={`
-                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md transition-colors
-                  /* STYLE: Update active/inactive states */
+                  flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
                   ${activeSort === 'trending' ?
-                    'bg-indigo-600 text-white shadow-sm' :
-                    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'}
+                    'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
+                    'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
                 `}
               >
                 <TrendingUp className="h-4 w-4" />
@@ -322,28 +358,26 @@ const HomePage: React.FC = () => {
               <button
                 onClick={() => setActiveSort('newest')}
                 className={`
-                  flex items-center space-x-1 text-sm px-3 py-1.5 rounded-md transition-colors
-                  /* STYLE: Update active/inactive states */
+                  flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
                   ${activeSort === 'newest' ?
-                    'bg-indigo-600 text-white shadow-sm' :
-                    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'}
+                    'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
+                    'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
                 `}
               >
                 <Sparkles className="h-4 w-4" />
                 <span>Newest</span>
               </button>
             </div>
-
           </div>
 
-          {/* Palette Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Enhanced Palette Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {palettesToDisplay.map(palette => (
               <PaletteCard
                 key={palette.id}
                 palette={palette}
                 onLike={handleLikePalette}
-                isLiked={likedPalettes.has(palette.id)} // Pass liked status down
+                isLiked={likedPalettes.has(palette.id)}
               />
             ))}
           </div>
@@ -351,91 +385,61 @@ const HomePage: React.FC = () => {
           {/* Sentinel Element for Intersection Observer */}
           <div ref={loadMoreRef} style={{ height: '10px' }} />
 
-          {/* Loading indicator for infinite scroll */}
+          {/* Enhanced loading indicator for infinite scroll */}
           {loading && allPalettes.length > 0 && (
-             <div className="text-center py-8">
-               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+             <div className="text-center py-12">
+               <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto" style={{ 
+                 mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
+                 WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
+               }}></div>
              </div>
           )}
 
-          {/* No Results Message */}
+          {/* Enhanced No Results Message */}
           {palettesToDisplay.length === 0 && !loading && (
-            <div className="text-center py-16">
-              <p className="text-lg text-gray-600 mb-2">
-                {searchQuery ?
-                  `No palettes found for "${searchQuery}"` :
-                  (activeFilter ? 'No palettes found with the selected filter.' : 'No palettes available.')
-                }
-              </p>
-              <div className="space-x-2">
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-                  >
-                    Clear search
-                  </button>
-                )}
-                {activeFilter && (
-                  <button
-                    onClick={() => setActiveFilter(null)}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-                  >
-                    Clear filter
-                  </button>
-                )}
+            <div className="text-center py-20">
+              <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl max-w-md mx-auto">
+                <p className="text-xl text-gray-600 mb-4 font-medium">
+                  {searchQuery ?
+                    `No palettes found for "${searchQuery}"` :
+                    (activeFilter ? 'No palettes found with the selected filter.' : 'No palettes available.')
+                  }
+                </p>
+                <div className="space-x-3">
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
+                    >
+                      Clear search
+                    </button>
+                  )}
+                  {activeFilter && (
+                    <button
+                      onClick={() => setActiveFilter(null)}
+                      className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
+                    >
+                      Clear filter
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )}
-        </main>
+        </div>
+      </main>
 
-        {/* Right Sidebar - Heading and Promo - Hidden on mobile */}
-        {/* STYLE: Update border to border-gray-300, keep bg-white */}
-        <aside className="hidden lg:block w-72 border-l border-gray-300 bg-white">
-          <div className="sticky top-0 px-4 py-8 h-screen ">
-            <h1 className="text-2xl font-bold mb-2 text-gray-800">Curated Color Palettes</h1>
-            <p className="text-gray-600">
-              Explore thoughtfully curated 4-color palettes designed for real-world UI use.
-            </p>
-
-            {/* Promo Section - Keep gradient, update text/inner box styles */}
-            <div className="mt-8 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl p-6">
-              <h2 className="text-lg font-bold mb-3 text-indigo-900">Design with Confidence</h2>
-              <p className="text-indigo-800 mb-4 text-sm">
-                ColorCura helps you visualize and experiment with color combinations that truly work — no guesswork needed.
-              </p>
-              <div className="space-y-2">
-                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
-                  <span className="font-medium">4 colors</span> per palette for harmony
-                </div>
-                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
-                  <span className="font-medium">Smart</span> role suggestions (Heading, Accent, Background)
-                </div>
-                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
-                  <span className="font-medium">Live</span> UI mockup previews
-                </div>
-                <div className="px-3 py-1.5 bg-white/70 rounded-md shadow-sm text-sm text-indigo-900">
-                  <span className="font-medium">Gradient</span> generator with CSS export
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-
-      {/* Mobile Bottom Bar - Tags - Sticky */}
-      {/* STYLE: Update background to bg-gray-50, border-gray-300 */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 border-t border-gray-300 bg-gray-50 shadow-lg z-10">
-        <div className="overflow-x-auto">
-          <div className="flex space-x-2 min-w-max">
+      {/* Mobile Bottom Bar - Tags (Mobile/Tablet) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-white/30 shadow-lg z-50">
+        <div className="px-4 py-3">
+          <div className="flex items-center space-x-3 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => setActiveFilter(null)}
               className={`
-                px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors
-                /* STYLE: Update active state */
+                flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
                 ${!activeFilter ?
-                  'bg-indigo-100 text-indigo-800 font-medium' :
-                  'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}
+                  'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' :
+                  'bg-white/80 text-gray-700 border border-white/50 hover:bg-white'}
               `}
             >
               All
@@ -446,11 +450,10 @@ const HomePage: React.FC = () => {
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
                 className={`
-                  px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors
-                  /* STYLE: Update active state */
+                  flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
                   ${activeFilter === tag ?
-                    'bg-indigo-100 text-indigo-800 font-medium' :
-                    'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}
+                    'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' :
+                    'bg-white/80 text-gray-700 border border-white/50 hover:bg-white'}
                 `}
               >
                 {capitalizeFirstLetter(tag)}
@@ -464,4 +467,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-

@@ -29,7 +29,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
 
   return (
     <div 
-      className="w-full rounded-lg overflow-hidden shadow-xl border cursor-pointer"
+      className="w-full rounded-xl overflow-hidden shadow-xl border cursor-pointer"
       style={{ backgroundColor: background, borderColor: border }}
       onClick={() => onElementClick('background')} 
       title="Click to change Background role"
