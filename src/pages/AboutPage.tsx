@@ -16,7 +16,7 @@ const AboutContactPage: React.FC = () => {
             <div className="flex justify-center mb-8">
               <div className="relative group">
                 <img
-                  src="/colorcura-icon2.png"
+                  src="/colorcura-icon2.webp"
                   alt="Colorcura Logo"
                   className="h-24 w-24 object-contain drop-shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-12"
                 />

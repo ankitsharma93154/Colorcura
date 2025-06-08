@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
         <Link to="/" className="flex items-center space-x-3 group">
           <div className="relative">
             <img
-              src="/colorcura-icon2.png"
+              src="/colorcura-icon2.webp"
               alt="Colorcura Logo"
               className="h-10 w-10 object-contain transition-all duration-300 group-hover:scale-110 drop-shadow-lg"
             />
