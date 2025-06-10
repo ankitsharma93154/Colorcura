@@ -270,40 +270,39 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Fixed Right Sidebar (Desktop) */}
-      <aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
-        <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
-          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-            Curated Color Palettes
-          </h1>
-          <p className="text-gray-600 mb-8 leading-relaxed">
-            Explore thoughtfully curated 4-color palettes designed for real-world UI use.
-          </p>
+<aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
+  <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
+    <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+      Not Just Palettes.
+    </h1>
+    <p className="text-gray-600 mb-8 leading-relaxed">
+      Colorcura lets you <span className="font-semibold text-indigo-700">preview any palette</span> in a real UI mockup instantly.
+      See how your colors actually feel in context — not just how they look in a grid.
+    </p>
 
-          {/* Enhanced Promo Section */}
-          <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
-            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
-              Design with Confidence
-            </h2>
-            <p className="text-indigo-800 mb-6 text-sm leading-relaxed">
-              ColorCura helps you visualize how colors work together in real interfaces. No more guessing – see your palette in action before you commit.
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center text-sm text-indigo-700">
-                <div className="w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></div>
-                <span>Live UI previews</span>
-              </div>
-              <div className="flex items-center text-sm text-indigo-700">
-                <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></div>
-                <span>Smart color role suggestions</span>
-              </div>
-              <div className="flex items-center text-sm text-indigo-700">
-                <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></div>
-                <span>Gradient generator</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+    {/* Promo Section */}
+    <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
+      <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
+        Why Colorcura?
+      </h2>
+      <ul className="space-y-4 text-sm text-indigo-800 leading-relaxed">
+        <li className="flex items-start">
+          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></span>
+          Live UI mockup previews — click any palette to see it in action.
+        </li>
+        <li className="flex items-start">
+          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></span>
+          Smart color role suggestions for buttons, backgrounds, and accents.
+        </li>
+        <li className="flex items-start">
+          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></span>
+          Built-in gradient generator to complete your design system.
+        </li>
+      </ul>
+    </div>
+  </div>
+</aside>
+
 
       {/* Main Content - with proper margins for sidebars */}
       <main className="flex-1 md:ml-48 lg:mr-80 min-h-screen overflow-y-auto bg-white/40 backdrop-blur-sm">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Mail, Twitter, Linkedin, Eye, Layout, Lightbulb } from 'lucide-react';
+import { Palette, Mail, Twitter, Linkedin, Eye, Layout, Lightbulb, ExternalLink, Volume2, Type } from 'lucide-react';
 
 const AboutContactPage: React.FC = () => {
   return (
@@ -114,6 +114,60 @@ const AboutContactPage: React.FC = () => {
                 </p>
                 <p className="text-xl font-semibold bg-gradient-to-r from-indigo-800 to-blue-800 bg-clip-text text-transparent mb-0">
                   It's a tool I wish I had earlier — and I hope it helps you too.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Other Projects Section */}
+          <section className="mb-20">
+            <h2 className="text-4xl font-bold mb-12 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent text-center flex items-center justify-center">
+              <ExternalLink className="mr-4 h-10 w-10 text-indigo-600" />
+              Other Projects by Me
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+                <div className="flex items-center mb-6">
+                  <div className="p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                    <Volume2 className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+                    <a 
+                      href="https://quickpronounce.site"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-blue-700 transition-colors flex items-center gap-2"
+                    >
+                      QuickPronounce
+                      <ExternalLink size={18} />
+                    </a>
+                  </h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Instant audio pronunciation for any English word with American, British, Australian & Indian accents. Includes meanings, phonetics, examples, and speed controls.
+                </p>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+                <div className="flex items-center mb-6">
+                  <div className="p-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                    <Type className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-purple-800 bg-clip-text text-transparent">
+                    <a 
+                      href="https://lushfonts.site"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-purple-700 transition-colors flex items-center gap-2"
+                    >
+                      LushFonts
+                      <ExternalLink size={18} />
+                    </a>
+                  </h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Generate fancy text in various font styles instantly with customizable borders and themed emojis - perfect for social media and design.
                 </p>
               </div>
             </div>
@@ -277,4 +331,3 @@ const AboutContactPage: React.FC = () => {
 };
 
 export default AboutContactPage;
-
