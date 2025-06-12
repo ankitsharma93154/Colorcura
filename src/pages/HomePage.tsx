@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [activeSort, setActiveSort] = useState<'trending' | 'newest'>('trending');
+  const [activeSort, setActiveSort] = useState<'trending' | 'newest'>('newest'); 
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const observer = useRef<IntersectionObserver | null>(null);
