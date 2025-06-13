@@ -55,3 +55,21 @@ export const getMockPaletteById = async (
 };
 
 
+
+
+// Function to update likes count for a palette
+export const updatePaletteLikes = async (paletteId: number, newLikesCount: number): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from("palettes")
+    .update({ likes_count: newLikesCount })
+    .eq("id", paletteId);
+
+  if (error) {
+    console.error(`Error updating likes for palette ${paletteId}:`, error.message);
+    return false;
+  }
+  console.log(`Successfully updated likes for palette ${paletteId} to ${newLikesCount}`);
+  return true;
+};
+
+

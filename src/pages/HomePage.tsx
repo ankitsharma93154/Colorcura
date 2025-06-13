@@ -1,67 +1,74 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+// src/pages/HomePage.tsx
+import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import { TrendingUp, Sparkles, Search } from 'lucide-react';
 import PaletteCard from '../components/palette/PaletteCard';
-import { fetchPalettes, ColorPalette } from '../data/mockData';
+import { fetchPalettes, ColorPalette, updatePaletteLikes } from '../data/mockData';
 
-// Cache for palettes - simple in-memory cache
-let paletteCache: ColorPalette[] | null = null;
-let cacheTimestamp: number | null = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+import { useHomePage } from '../context/HomePageStateContext';
 
-const PALETTES_PER_PAGE = 15; // Number of palettes to load per scroll
+const PALETTES_PER_PAGE = 27;
 
 const HomePage: React.FC = () => {
-  const [allPalettes, setAllPalettes] = useState<ColorPalette[]>([]); // Holds all fetched palettes (cache)
-  const [displayedPalettesCount, setDisplayedPalettesCount] = useState<number>(PALETTES_PER_PAGE);
-  const [likedPalettes, setLikedPalettes] = useState<Set<number>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [activeSort, setActiveSort] = useState<'trending' | 'newest'>('newest'); 
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const {
+    allPalettes,
+    setAllPalettes,
+    displayedPalettesCount,
+    setDisplayedPalettesCount,
+    likedPalettes,
+    setLikedPalettes,
+    loading,
+    setLoading,
+    error,
+    setError,
+    activeFilter,
+    setActiveFilter,
+    activeSort,
+    setActiveSort,
+    searchQuery,
+    setSearchQuery,
+    scrollPosition,
+    setScrollPosition,
+  } = useHomePage();
 
   const observer = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null); // Ref for the element to observe
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch palettes and manage cache
+  // --- Data Fetching and Initial Load ---
   useEffect(() => {
     const loadPalettes = async () => {
-      const now = Date.now();
-      // Check cache validity
-      if (paletteCache && cacheTimestamp && (now - cacheTimestamp < CACHE_DURATION)) {
-        console.log('Using cached palettes');
-        setAllPalettes(paletteCache);
+      if (allPalettes.length > 0) {
         setLoading(false);
         return;
       }
 
-      // Fetch new data if cache is invalid or empty
       try {
         console.log('Fetching new palettes...');
         setLoading(true);
         const data = await fetchPalettes();
-        paletteCache = data; // Update cache
-        cacheTimestamp = now; // Update timestamp
         setAllPalettes(data);
       } catch (err) {
         setError('Failed to load palettes');
         console.error('Error loading palettes:', err);
-        paletteCache = null; // Clear cache on error
-        cacheTimestamp = null;
       } finally {
         setLoading(false);
       }
     };
 
     loadPalettes();
-  }, []);
+  }, [allPalettes.length, setAllPalettes, setLoading, setError]);
 
-  // Reset displayed count when filters/sort/search change
+  // --- Reset displayed count when filters/sort/search change ---
   useEffect(() => {
+    // This effect's dependencies are crucial. Ensure it only runs when criteria change.
     setDisplayedPalettesCount(PALETTES_PER_PAGE);
-  }, [activeFilter, activeSort, searchQuery]);
+    // When filter/sort/search changes, we typically want to scroll to top for new results.
+    // However, if the user explicitly wants to retain scroll, this needs to be re-thought.
+    // For now, let's assume new criteria means a "fresh" view.
+    setScrollPosition(0); // Reset scroll position when filters/sort/search change
+  }, [activeFilter, activeSort, searchQuery, setDisplayedPalettesCount, setScrollPosition]);
 
-  // Memoize filtering and sorting operations
+  // --- Filtering and Sorting ---
+  // Memoize this heavily, as it's a core data transformation.
   const filteredAndSortedPalettes = useMemo(() => {
     let processedPalettes = allPalettes;
 
@@ -70,7 +77,7 @@ const HomePage: React.FC = () => {
       processedPalettes = processedPalettes.filter(palette => palette.tags.includes(activeFilter));
     }
 
-    // Filter by search query
+    // Filter by search query (case-insensitive, partial match)
     if (searchQuery.trim() !== '') {
       const lowerCaseQuery = searchQuery.toLowerCase().trim();
       processedPalettes = processedPalettes.filter(palette =>
@@ -78,48 +85,51 @@ const HomePage: React.FC = () => {
       );
     }
 
-    // FIX: Sort a *copy* of the array to avoid mutating state directly
-    const sortedPalettes = [...processedPalettes].sort((a, b) => { // Create copy with spread syntax [...]
+    // Sort a *copy* of the array to avoid mutating state directly
+    const sortedPalettes = [...processedPalettes].sort((a, b) => {
       if (activeSort === 'trending') {
-        // Ensure likes_count exists, default to 0 if not
         const likesA = a.likes_count ?? 0;
         const likesB = b.likes_count ?? 0;
         return likesB - likesA;
-      } else { // newest
-        // Ensure created_at exists and is valid, fallback to 0 timestamp if not
+      } else { // 'newest'
         const dateA = new Date(a.created_at).getTime();
         const dateB = new Date(b.created_at).getTime();
-        // Handle potential NaN from invalid dates
         return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
       }
     });
 
-    return sortedPalettes; // Return the newly sorted copy
-  }, [allPalettes, activeFilter, activeSort, searchQuery]);
+    return sortedPalettes;
+  }, [allPalettes, activeFilter, activeSort, searchQuery]); // Dependencies are correct here
 
   // Palettes to actually display based on infinite scroll count
+  // This is also memoized, so it only re-slices when the underlying data or count changes.
   const palettesToDisplay = useMemo(() => {
     return filteredAndSortedPalettes.slice(0, displayedPalettesCount);
   }, [filteredAndSortedPalettes, displayedPalettesCount]);
 
-  // Infinite scroll observer setup
+  // --- Infinite Scroll Observer Setup ---
   const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
     if (target.isIntersecting && !loading) {
-      // Check if there are more palettes to load
       if (displayedPalettesCount < filteredAndSortedPalettes.length) {
-        console.log('Loading more palettes...');
+        // console.log('Loading more palettes via infinite scroll...');
         setDisplayedPalettesCount(prevCount => prevCount + PALETTES_PER_PAGE);
       }
     }
-  }, [loading, displayedPalettesCount, filteredAndSortedPalettes.length]);
+  }, [loading, displayedPalettesCount, filteredAndSortedPalettes.length, setDisplayedPalettesCount]);
 
   useEffect(() => {
     const options = {
-      root: null, // relative to document viewport
-      rootMargin: '0px',
-      threshold: 1.0 // Trigger when 100% visible
+      root: null,
+      // Increase rootMargin to trigger load earlier, preventing blank space
+      rootMargin: '0px 0px 200px 0px', // Load when 200px from bottom
+      threshold: 0.1 // Can be less strict than 1.0, means trigger when 10% visible
     };
+
+    // Ensure previous observer is disconnected before creating a new one
+    if (observer.current) {
+        observer.current.disconnect();
+    }
 
     observer.current = new IntersectionObserver(handleObserver, options);
 
@@ -128,55 +138,96 @@ const HomePage: React.FC = () => {
       observer.current.observe(currentLoadMoreRef);
     }
 
-    // Cleanup observer on component unmount or when ref changes
     return () => {
       if (observer.current && currentLoadMoreRef) {
         observer.current.unobserve(currentLoadMoreRef);
       }
     };
-  }, [handleObserver]); // Re-run if handleObserver changes (due to dependencies)
+    // Re-run observer setup if handleObserver changes.
+    // handleObserver itself uses useCallback, so it only changes if its dependencies change.
+  }, [handleObserver]);
 
-  // Update liked palettes (operates on the cached `allPalettes`)
-  const handleLikePalette = (id: number) => {
+
+  // --- Scroll Position Retention ---
+  // Save scroll position with a throttle to avoid excessive updates
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    const THROTTLE_DELAY = 100; // ms
+
+    const handleScroll = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        setScrollPosition(window.scrollY);
+        timeoutId = null;
+      }, THROTTLE_DELAY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [setScrollPosition]);
+
+  // Restore scroll position when the component mounts and scrollPosition from context is available
+  useEffect(() => {
+    // Only scroll if a position was saved AND if the current scroll position is not already close
+    // This prevents jarring jumps if the page loaded at the correct position naturally.
+    if (scrollPosition > 0 && Math.abs(window.scrollY - scrollPosition) > 20) { // Add a small threshold
+      window.scrollTo(0, scrollPosition);
+    }
+  }, [scrollPosition]);
+
+
+  // --- Like Functionality ---
+  const handleLikePalette = useCallback(async (id: number) => {
     const isCurrentlyLiked = likedPalettes.has(id);
     const newLikedPalettes = new Set(likedPalettes);
+    let newLikesCount: number;
+
+    const updatedAllPalettes = allPalettes.map(palette => {
+      if (palette.id === id) {
+        newLikesCount = isCurrentlyLiked
+          ? (palette.likes_count ?? 0) - 1
+          : (palette.likes_count ?? 0) + 1;
+
+        updatePaletteLikes(id, newLikesCount); // Persist to mock data/backend
+
+        return {
+          ...palette,
+          likes_count: newLikesCount
+        };
+      }
+      return palette;
+    });
+
     if (isCurrentlyLiked) {
       newLikedPalettes.delete(id);
     } else {
       newLikedPalettes.add(id);
     }
     setLikedPalettes(newLikedPalettes);
-
-    // Update the master list (cache)
-    const updatedAllPalettes = allPalettes.map(palette => {
-      if (palette.id === id) {
-        return {
-          ...palette,
-          likes_count: isCurrentlyLiked
-            ? (palette.likes_count ?? 0) - 1
-            : (palette.likes_count ?? 0) + 1
-        };
-      }
-      return palette;
-    });
     setAllPalettes(updatedAllPalettes);
-    paletteCache = updatedAllPalettes; // Keep cache in sync
-  };
+  }, [allPalettes, likedPalettes, setAllPalettes, setLikedPalettes]); // Dependencies for useCallback
 
-  // Helper function to capitalize first letter
-  const capitalizeFirstLetter = (str: string) => {
+
+  // --- Helper Functions ---
+  const capitalizeFirstLetter = useCallback((str: string) => {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  }, []); // No dependencies, can be memoized once
 
   // Calculate tags based on *all* palettes for consistent filtering options
   const allTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
     allPalettes.forEach(palette => {
-      // Ensure tags is an array before iterating
       if (Array.isArray(palette.tags)) {
           palette.tags.forEach(tag => {
-            if (tag) { // Ensure tag is not null/undefined
+            if (tag) {
                 tagCounts[tag] = (tagCounts[tag] || 0) + 1;
             }
           });
@@ -186,19 +237,18 @@ const HomePage: React.FC = () => {
       .sort(([, a], [, b]) => b - a)
       .slice(0, 20)
       .map(([tag]) => tag);
-  }, [allPalettes]);
+  }, [allPalettes]); // Dependency on allPalettes is correct.
 
   // --- Render Logic ---
 
-  if (loading && allPalettes.length === 0) { // Show initial loading state only
+  if (loading && allPalettes.length === 0) {
     return (
       <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
-        {/* Animated background elements */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-24 h-24 bg-gradient-to-br from-pink-400/20 to-orange-500/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        
+
         <div className="relative z-10 text-center py-16">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto mb-6" style={{ 
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto mb-6" style={{
             mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
             WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
           }}></div>
@@ -211,13 +261,12 @@ const HomePage: React.FC = () => {
   if (error) {
     return (
       <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
-        {/* Animated background elements */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-red-400/20 to-orange-500/20 rounded-full blur-3xl animate-pulse"></div>
-        
+
         <div className="relative z-10 text-center py-16">
           <p className="text-xl text-red-600 mb-6 font-medium">{error}</p>
           <button
-            onClick={() => window.location.reload()} // Simple reload for error state
+            onClick={() => window.location.reload()}
             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
           >
             Try Again
@@ -233,7 +282,7 @@ const HomePage: React.FC = () => {
       <div className="fixed top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
       <div className="fixed bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-400/10 to-orange-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-      
+
       {/* Fixed Left Sidebar - Tags (Desktop) */}
       <div className="hidden md:block w-48 h-screen fixed left-0 top-18 border-r border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
         <div className="p-6 h-full overflow-y-auto scrollbar-hide">
@@ -270,39 +319,38 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Fixed Right Sidebar (Desktop) */}
-<aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
-  <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
-    <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-      Not Just Palettes.
-    </h1>
-    <p className="text-gray-600 mb-8 leading-relaxed">
-      Colorcura lets you <span className="font-semibold text-indigo-700">preview any palette</span> in a real UI mockup instantly.
-      See how your colors actually feel in context — not just how they look in a grid.
-    </p>
+      <aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
+        <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
+          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+            Not Just Palettes.
+          </h1>
+          <p className="text-gray-600 mb-8 leading-relaxed">
+            Colorcura lets you <span className="font-semibold text-indigo-700">preview any palette</span> in a real UI mockup instantly.
+            See how your colors actually feel in context — not just how they look in a grid.
+          </p>
 
-    {/* Promo Section */}
-    <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
-      <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
-        Why Colorcura?
-      </h2>
-      <ul className="space-y-4 text-sm text-indigo-800 leading-relaxed">
-        <li className="flex items-start">
-          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></span>
-          Live UI mockup previews — click any palette to see it in action.
-        </li>
-        <li className="flex items-start">
-          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></span>
-          Smart color role suggestions for buttons, backgrounds, and accents.
-        </li>
-        <li className="flex items-start">
-          <span className="w-2 h-2 mt-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></span>
-          Built-in gradient generator to complete your design system.
-        </li>
-      </ul>
-    </div>
-  </div>
-</aside>
-
+          {/* Promo Section */}
+          <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
+            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
+              Why Colorcura?
+            </h2>
+            <ul className="space-y-4 text-sm text-indigo-800 leading-relaxed">
+              <li className="flex items-start">
+                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></span>
+                Live UI mockup previews — click any palette to see it in action.
+              </li>
+              <li className="flex items-start">
+                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></span>
+                Smart color role suggestions for buttons, backgrounds, and accents.
+              </li>
+              <li className="flex items-start">
+                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></span>
+                Built-in gradient generator to complete your design system.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
 
       {/* Main Content - with proper margins for sidebars */}
       <main className="flex-1 md:ml-48 lg:mr-80 min-h-screen overflow-y-auto bg-white/40 backdrop-blur-sm">
@@ -387,7 +435,7 @@ const HomePage: React.FC = () => {
           {/* Enhanced loading indicator for infinite scroll */}
           {loading && allPalettes.length > 0 && (
              <div className="text-center py-12">
-               <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto" style={{ 
+               <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto" style={{
                  mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
                  WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
                }}></div>
@@ -425,6 +473,10 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           )}
+          {/* "You've reached the end" message */}
+          {!loading && displayedPalettesCount >= filteredAndSortedPalettes.length && (
+            <p className="text-center text-gray-500 mt-8">You've reached the end of the palettes!</p>
+          )}
         </div>
       </main>
 
@@ -453,7 +505,7 @@ const HomePage: React.FC = () => {
                   ${activeFilter === tag ?
                     'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' :
                     'bg-white/80 text-gray-700 border border-white/50 hover:bg-white'}
-                `}
+              `}
               >
                 {capitalizeFirstLetter(tag)}
               </button>
