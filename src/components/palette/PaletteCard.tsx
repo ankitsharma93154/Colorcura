@@ -95,10 +95,11 @@ const PaletteCard: React.FC<PaletteCardProps> = ({ palette, onLike, isLiked }) =
 
       {/* Enhanced like button with glassmorphism */}
       <button
-        onClick={handleLike}
-        className="absolute -bottom-4 left-36 flex items-center space-x-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-all duration-300 px-4 py-2 rounded-full shadow-lg border border-white/30 dark:border-gray-600/30 hover:scale-110 hover:-translate-y-1 hover:shadow-xl group/like z-50"
-        aria-label="Like"
-      >
+  onClick={handleLike}
+  // Changed left-36 to right-4 and adjusted bottom for better visual placement
+  className="absolute -bottom-4 right-4 flex items-center space-x-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-all duration-300 px-4 py-2 rounded-full shadow-lg border border-white/30 dark:border-gray-600/30 hover:scale-110 hover:-translate-y-1 hover:shadow-xl group/like z-50"
+  aria-label="Like"
+>
         <Heart
           className={`h-4 w-4 transition-all duration-300 group-hover/like:scale-110 ${
             isLiked
