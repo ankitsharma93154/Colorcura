@@ -1,6 +1,6 @@
 // MockupPreview.tsx (Light Mode Only) - Full Width Version
-import React from 'react';
-import { Palette, Shuffle, LayoutGrid, Feather, Star, Heart, Copy, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Palette, Shuffle, LayoutGrid, Feather, Star, Heart, Copy, Download, Menu, X } from 'lucide-react';
 import { ColorRoles } from '../../utils/colorUtils';
 
 interface MockupPreviewProps {
@@ -27,6 +27,12 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
     textOnPrimary, textOnAccent, border 
   } = colorRoles;
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div 
       className="w-full rounded-xl overflow-hidden shadow-xl border cursor-pointer"
@@ -36,7 +42,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
     >
       {/* Header - primary role */}
       <header
-        className="px-6 py-4 flex justify-between items-center border-b cursor-pointer"
+        className="px-6 py-4 flex justify-between items-center border-b cursor-pointer relative"
         style={{ backgroundColor: primary, borderColor: border, color: textOnPrimary }}
         onClick={(e) => { e.stopPropagation(); onElementClick('primary'); }}
         title="Click to change Primary role"
@@ -48,7 +54,24 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
             ColorCura
           </div>
         </div>
-        <nav className="flex items-center space-x-6">
+
+        {/* Hamburger menu button for mobile */}
+        <div className="md:hidden flex items-center">
+          <button 
+            onClick={(e) => { e.stopPropagation(); toggleMenu(); }} 
+            className="p-2 rounded-lg hover:bg-black/10 transition-all duration-300"
+            style={{ color: textOnPrimary }}
+          >
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+
+        {/* Desktop navigation - hidden on mobile */}
+        <nav className="hidden md:flex items-center space-x-6">
           {["Explore", "Generate", "Tools", "About"].map((item) => (
             <div 
               key={item} 
@@ -60,6 +83,28 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
             </div>
           ))}
         </nav>
+
+        {/* Mobile dropdown menu */}
+        {isMenuOpen && (
+          <div 
+            className="md:hidden absolute top-full left-0 right-0 border-b shadow-lg z-10"
+            style={{ backgroundColor: primary, borderColor: border }}
+          >
+            <nav className="flex flex-col px-6 py-4 space-y-3">
+              {["Explore", "Generate", "Tools", "About"].map((item) => (
+                <div 
+                  key={item} 
+                  className="font-medium text-sm hover:opacity-70 cursor-pointer transition-opacity py-2"
+                  style={{ color: textOnPrimary }}
+                  onClick={(e) => { e.stopPropagation(); onElementClick('textOnPrimary'); setIsMenuOpen(false); }}
+                  title="Click to change Text on Primary role"
+                >
+                  {item}
+                </div>
+              ))}
+            </nav>
+          </div>
+        )}
       </header>
       
       {/* Hero Section - background role */}
