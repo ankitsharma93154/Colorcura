@@ -279,7 +279,7 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href="https://colorcura.site/" />
+        <link rel="canonical" href="https://www.colorcura.site/" />
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         <div className="relative min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 overflow-x-hidden">

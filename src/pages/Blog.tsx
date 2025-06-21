@@ -42,7 +42,7 @@ const Blog: React.FC = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href="https://colorcura.site/blog" />
+        <link rel="canonical" href="https://www.colorcura.site/blog" />
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Section */}

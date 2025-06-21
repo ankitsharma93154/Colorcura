@@ -698,7 +698,7 @@ const PaletteDetailPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href={`https://colorcura.site/palette/${id}`} />
+        <link rel="canonical" href={`https://www.colorcura.site/palette/${id}`} />
       </Helmet>
       <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 text-gray-900">
         <div className="container mx-auto space-y-8">

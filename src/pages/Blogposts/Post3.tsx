@@ -6,7 +6,7 @@ const Post3: React.FC = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href="https://colorcura.site/blog/css-gradients-guide" />
+        <link rel="canonical" href="https://www.colorcura.site/blog/css-gradients-guide" />
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Image */}

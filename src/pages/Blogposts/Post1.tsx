@@ -328,7 +328,7 @@ const Post1 = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href="https://colorcura.site/blog/website-color-schemes-2025" />
+        <link rel="canonical" href="https://www.colorcura.site/blog/website-color-schemes-2025" />
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Image */}

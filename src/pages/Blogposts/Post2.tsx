@@ -6,7 +6,7 @@ const Post2: React.FC = () => {
   return (
     <>
       <Helmet>
-        <link rel="canonical" href="https://colorcura.site/blog/color-psychology-conversions" />
+        <link rel="canonical" href="https://www.colorcura.site/blog/color-psychology-conversions" />
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Image */}
