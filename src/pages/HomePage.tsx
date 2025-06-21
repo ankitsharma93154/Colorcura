@@ -1,12 +1,57 @@
 // src/pages/HomePage.tsx
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
-import { TrendingUp, Sparkles, Search } from 'lucide-react';
+import { TrendingUp, Sparkles, Search, Palette, Leaf, Star, Briefcase, Code, ShoppingBag, Paintbrush } from 'lucide-react';
 import PaletteCard from '../components/palette/PaletteCard';
 import { fetchPalettes, ColorPalette, updatePaletteLikes } from '../data/mockData';
 
 import { useHomePage } from '../context/HomePageStateContext';
 
 const PALETTES_PER_PAGE = 27;
+
+const SIDEBAR_CATEGORIES = [
+  {
+    label: 'Trending',
+    icon: <TrendingUp className="h-5 w-5 text-indigo-600" />,
+    tags: ['trending', 'popular', 'hot'],
+    gradient: 'from-indigo-500 to-purple-600',
+  },
+  {
+    label: 'Professional',
+    icon: <Briefcase className="h-5 w-5 text-gray-700" />,
+    tags: ['professional', 'corporate', 'minimal', 'business', 'executive'],
+    gradient: 'from-gray-700 to-gray-400',
+  },
+  {
+    label: 'Creative',
+    icon: <Paintbrush className="h-5 w-5 text-pink-500" />,
+    tags: ['creative', 'art', 'portfolio', 'studio', 'design'],
+    gradient: 'from-pink-500 to-purple-400',
+  },
+  {
+    label: 'Nature',
+    icon: <Leaf className="h-5 w-5 text-green-600" />,
+    tags: ['nature', 'eco', 'organic', 'green', 'sustainability'],
+    gradient: 'from-green-500 to-emerald-400',
+  },
+  {
+    label: 'Luxury',
+    icon: <Star className="h-5 w-5 text-yellow-500" />,
+    tags: ['luxury', 'premium', 'gold', 'royal'],
+    gradient: 'from-yellow-400 to-yellow-700',
+  },
+  {
+    label: 'Technology',
+    icon: <Code className="h-5 w-5 text-blue-600" />,
+    tags: ['technology', 'saas', 'tech', 'software', 'fintech'],
+    gradient: 'from-blue-500 to-cyan-400',
+  },
+  {
+    label: 'E-commerce',
+    icon: <ShoppingBag className="h-5 w-5 text-orange-500" />,
+    tags: ['ecommerce', 'store', 'shop', 'fashion', 'retail'],
+    gradient: 'from-orange-400 to-pink-500',
+  },
+];
 
 const HomePage: React.FC = () => {
   const {
@@ -223,21 +268,17 @@ const HomePage: React.FC = () => {
 
   // Calculate tags based on *all* palettes for consistent filtering options
   const allTags = useMemo(() => {
-    const tagCounts: Record<string, number> = {};
+    const tagSet = new Set<string>();
     allPalettes.forEach(palette => {
       if (Array.isArray(palette.tags)) {
-          palette.tags.forEach(tag => {
-            if (tag) {
-                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-            }
-          });
+        palette.tags.forEach(tag => {
+          if (tag) tagSet.add(tag);
+        });
       }
     });
-    return Object.entries(tagCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 20)
-      .map(([tag]) => tag);
-  }, [allPalettes]); // Dependency on allPalettes is correct.
+    return Array.from(tagSet).sort();
+  }, [allPalettes]);
+  const limitedTags = allTags.slice(0, 20);
 
   // --- Render Logic ---
 
@@ -277,208 +318,209 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">
+    <div className="relative min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 overflow-x-hidden">
       {/* Animated background elements */}
-      <div className="fixed top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="fixed bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-400/10 to-orange-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+      <div className="fixed top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-purple-500/10 rounded-full blur-3xl animate-pulse pointer-events-none z-0"></div>
+      <div className="fixed bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-400/10 to-orange-500/10 rounded-full blur-2xl animate-pulse pointer-events-none z-0" style={{ animationDelay: '2s' }}></div>
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl animate-pulse pointer-events-none z-0" style={{ animationDelay: '4s' }}></div>
 
-      {/* Fixed Left Sidebar - Tags (Desktop) */}
-      <div className="hidden md:block w-48 h-screen fixed left-0 top-18 border-r border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
-        <div className="p-6 h-full overflow-y-auto scrollbar-hide">
-          <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Tags</h2>
-          <div className="space-y-2">
-            <button
-              onClick={() => setActiveFilter(null)}
-              className={`
-                block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm border
-                ${!activeFilter ?
-                  'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg border-indigo-300 scale-105' :
-                  'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow-md'}
-              `}
-            >
-              All Palettes
-            </button>
-
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => setActiveFilter(tag)}
-                className={`
-                  block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm border
-                  ${activeFilter === tag ?
-                    'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg border-indigo-300 scale-105' :
-                    'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow-md'}
-                `}
-              >
-                {capitalizeFirstLetter(tag)}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Fixed Right Sidebar (Desktop) */}
-      <aside className="hidden lg:block w-80 h-screen fixed right-0 top-18 border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-40">
-        <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
-          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-            Not Just Palettes.
-          </h1>
-          <p className="text-gray-600 mb-8 leading-relaxed">
-            Colorcura lets you <span className="font-semibold text-indigo-700">preview any palette</span> in a real UI mockup instantly.
-            See how your colors actually feel in context — not just how they look in a grid.
-          </p>
-
-          {/* Promo Section */}
-          <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
-            <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
-              Why Colorcura?
-            </h2>
-            <ul className="space-y-4 text-sm text-indigo-800 leading-relaxed">
-              <li className="flex items-start">
-                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></span>
-                Live UI mockup previews — click any palette to see it in action.
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></span>
-                Smart color role suggestions for buttons, backgrounds, and accents.
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 mt-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></span>
-                Built-in gradient generator to complete your design system.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content - with proper margins for sidebars */}
-      <main className="flex-1 md:ml-48 lg:mr-80 min-h-screen overflow-y-auto bg-white/40 backdrop-blur-sm">
-        <div className="p-6 md:p-8 pb-32 md:pb-6">
-          {/* Enhanced Search Bar */}
-          <div className="mb-6">
-            <div className="relative w-full max-w-3xl mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search by tags..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-12 pr-4 py-4 border border-white/30 rounded-2xl leading-5 bg-white/80 backdrop-blur-lg placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 shadow-lg text-lg transition-all duration-300 hover:shadow-xl"
-              />
-              {searchQuery && (
+      <div className="flex flex-1 w-full max-w-[1920px] mx-auto min-h-0">
+        {/* Left Sidebar */}
+        <aside className="hidden md:flex flex-col w-40 min-h-screen border-r border-white/30 bg-white/70 backdrop-blur-xl shadow-xl z-30 fixed left-0 top-20 bottom-0">
+          <div className="p-4 h-full overflow-y-auto scrollbar-hide flex flex-col gap-6">
+            <div>
+              <h2 className="text-base font-bold mb-3 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Tags</h2>
+              <div className="space-y-1">
                 <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setActiveFilter(null)}
+                  className={`block w-full text-left px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border
+                    ${!activeFilter ?
+                      'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 scale-105' :
+                      'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow'}
+                `}
                 >
-                  <span className="text-xl">×</span>
+                  All
                 </button>
+                {limitedTags.map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => setActiveFilter(tag)}
+                    className={`block w-full text-left px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border
+                      ${activeFilter === tag ?
+                        'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 scale-105' :
+                        'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow'}
+                  `}
+                  >
+                    {capitalizeFirstLetter(tag)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 md:ml-40 lg:mr-80 bg-white/40 backdrop-blur-sm min-h-screen">
+          <div className="p-6 md:p-8 pb-32 md:pb-6">
+            {/* Enhanced Search Bar */}
+            <div className="mb-6">
+              <div className="relative w-full max-w-3xl mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search by tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-12 pr-4 py-4 border border-white/30 rounded-2xl leading-5 bg-white/80 backdrop-blur-lg placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 shadow-lg text-lg transition-all duration-300 hover:shadow-xl"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <span className="text-xl">×</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Enhanced Search Results Info */}
+              {searchQuery && (
+                <p className="mt-4 text-center text-sm text-gray-600 font-medium">
+                  {filteredAndSortedPalettes.length} palette{filteredAndSortedPalettes.length !== 1 ? 's' : ''} found for "{searchQuery}"
+                </p>
               )}
             </div>
 
-            {/* Enhanced Search Results Info */}
-            {searchQuery && (
-              <p className="mt-4 text-center text-sm text-gray-600 font-medium">
-                {filteredAndSortedPalettes.length} palette{filteredAndSortedPalettes.length !== 1 ? 's' : ''} found for "{searchQuery}"
-              </p>
-            )}
-          </div>
+            {/* Enhanced Sort Controls */}
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setActiveSort('trending')}
+                  className={`
+                    flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
+                    ${activeSort === 'trending' ?
+                      'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
+                      'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
+                  `}
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Trending</span>
+                </button>
 
-          {/* Enhanced Sort Controls */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setActiveSort('trending')}
-                className={`
-                  flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
-                  ${activeSort === 'trending' ?
-                    'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
-                    'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
-                `}
-              >
-                <TrendingUp className="h-4 w-4" />
-                <span>Trending</span>
-              </button>
-
-              <button
-                onClick={() => setActiveSort('newest')}
-                className={`
-                  flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
-                  ${activeSort === 'newest' ?
-                    'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
-                    'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
-                `}
-              >
-                <Sparkles className="h-4 w-4" />
-                <span>Newest</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Enhanced Palette Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {palettesToDisplay.map(palette => (
-              <PaletteCard
-                key={palette.id}
-                palette={palette}
-                onLike={handleLikePalette}
-                isLiked={likedPalettes.has(palette.id)}
-              />
-            ))}
-          </div>
-
-          {/* Sentinel Element for Intersection Observer */}
-          <div ref={loadMoreRef} style={{ height: '10px' }} />
-
-          {/* Enhanced loading indicator for infinite scroll */}
-          {loading && allPalettes.length > 0 && (
-             <div className="text-center py-12">
-               <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto" style={{
-                 mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
-                 WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
-               }}></div>
-             </div>
-          )}
-
-          {/* Enhanced No Results Message */}
-          {palettesToDisplay.length === 0 && !loading && (
-            <div className="text-center py-20">
-              <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl max-w-md mx-auto">
-                <p className="text-xl text-gray-600 mb-4 font-medium">
-                  {searchQuery ?
-                    `No palettes found for "${searchQuery}"` :
-                    (activeFilter ? 'No palettes found with the selected filter.' : 'No palettes available.')
-                  }
-                </p>
-                <div className="space-x-3">
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
-                    >
-                      Clear search
-                    </button>
-                  )}
-                  {activeFilter && (
-                    <button
-                      onClick={() => setActiveFilter(null)}
-                      className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
-                    >
-                      Clear filter
-                    </button>
-                  )}
-                </div>
+                <button
+                  onClick={() => setActiveSort('newest')}
+                  className={`
+                    flex items-center space-x-2 text-sm px-5 py-3 rounded-xl font-medium transition-all duration-300 backdrop-blur-sm border shadow-lg hover:scale-105
+                    ${activeSort === 'newest' ?
+                      'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-300 shadow-indigo-500/25' :
+                      'bg-white/80 text-gray-700 border-white/30 hover:bg-white/90 hover:shadow-xl'}
+                  `}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span>Newest</span>
+                </button>
               </div>
             </div>
-          )}
-          {/* "You've reached the end" message */}
-          {!loading && displayedPalettesCount >= filteredAndSortedPalettes.length && (
-            <p className="text-center text-gray-500 mt-8">You've reached the end of the palettes!</p>
-          )}
-        </div>
-      </main>
+
+            {/* Enhanced Palette Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {palettesToDisplay.map(palette => (
+                <PaletteCard
+                  key={palette.id}
+                  palette={palette}
+                  onLike={handleLikePalette}
+                  isLiked={likedPalettes.has(palette.id)}
+                />
+              ))}
+            </div>
+
+            {/* Sentinel Element for Intersection Observer */}
+            <div ref={loadMoreRef} style={{ height: '10px' }} />
+
+            {/* Enhanced loading indicator for infinite scroll */}
+            {loading && allPalettes.length > 0 && (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-transparent bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-border mx-auto" style={{
+                  mask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)',
+                  WebkitMask: 'radial-gradient(farthest-side,#0000 calc(100% - 4px),#000 0)'
+                }}></div>
+              </div>
+            )}
+
+            {/* Enhanced No Results Message */}
+            {palettesToDisplay.length === 0 && !loading && (
+              <div className="text-center py-20">
+                <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl max-w-md mx-auto">
+                  <p className="text-xl text-gray-600 mb-4 font-medium">
+                    {searchQuery ?
+                      `No palettes found for "${searchQuery}"` :
+                      (activeFilter ? 'No palettes found with the selected filter.' : 'No palettes available.')
+                    }
+                  </p>
+                  <div className="space-x-3">
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
+                      >
+                        Clear search
+                      </button>
+                    )}
+                    {activeFilter && (
+                      <button
+                        onClick={() => setActiveFilter(null)}
+                        className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105"
+                      >
+                        Clear filter
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* "You've reached the end" message */}
+            {!loading && displayedPalettesCount >= filteredAndSortedPalettes.length && (
+              <p className="text-center text-gray-500 mt-8">You've reached the end of the palettes!</p>
+            )}
+          </div>
+        </main>
+
+        {/* Right Sidebar */}
+        <aside className="hidden lg:flex flex-col w-80 min-h-screen border-l border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-30 fixed right-0 top-16 bottom-0">
+          <div className="px-4 py-8 h-full overflow-y-auto scrollbar-hide">
+            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+              Not Just Palettes.
+            </h1>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              Colorcura lets you <span className="font-semibold text-indigo-700">preview any palette</span> in a real UI mockup instantly.
+              See how your colors actually feel in context — not just how they look in a grid.
+            </p>
+
+            {/* Promo Section */}
+            <div className="bg-gradient-to-br from-indigo-100/80 to-purple-100/80 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-lg">
+              <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-900 to-purple-900 bg-clip-text text-transparent">
+                Why Colorcura?
+              </h2>
+              <ul className="space-y-4 text-sm text-indigo-800 leading-relaxed">
+                <li className="flex items-start">
+                  <span className="w-2 h-2 mt-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3"></span>
+                  Live UI mockup previews — click any palette to see it in action.
+                </li>
+                <li className="flex items-start">
+                  <span className="w-2 h-2 mt-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3"></span>
+                  Smart color role suggestions for buttons, backgrounds, and accents.
+                </li>
+                <li className="flex items-start">
+                  <span className="w-2 h-2 mt-1 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mr-3"></span>
+                  Built-in gradient generator to complete your design system.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
 
       {/* Mobile Bottom Bar - Tags (Mobile/Tablet) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-white/30 shadow-lg z-50">
@@ -495,8 +537,7 @@ const HomePage: React.FC = () => {
             >
               All
             </button>
-
-            {allTags.map(tag => (
+            {limitedTags.map(tag => (
               <button
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
@@ -513,6 +554,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };

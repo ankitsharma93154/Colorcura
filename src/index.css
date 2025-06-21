@@ -1,3 +1,84 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Robust forced color and autofill protection for all browsers */
+:root {
+  --navbar-bg: #fff;
+  --navbar-text: #222;
+  --footer-bg: #fff;
+  --footer-text: #222;
+  --input-bg: #fff;
+  --input-text: #111;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navbar-bg: #18181b;
+    --navbar-text: #f3f4f6;
+    --footer-bg: #18181b;
+    --footer-text: #f3f4f6;
+    --input-bg: #18181b;
+    --input-text: #f3f4f6;
+  }
+}
+
+/* Only target the real app navbar/footer, not all headers/footers */
+.navbar,
+#navbar,
+.main-navbar {
+  background-color: var(--navbar-bg) !important;
+  color: var(--navbar-text) !important;
+}
+.footer,
+#footer,
+.main-footer {
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text) !important;
+}
+input,
+textarea,
+select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  caret-color: var(--input-text) !important;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--input-text) !important;
+  caret-color: var(--input-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+input:-moz-autofill,
+input:-moz-autofill:focus,
+input:-moz-autofill:hover,
+input:-moz-autofill:active {
+  box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  color: var(--input-text) !important;
+  caret-color: var(--input-text) !important;
+}
+input:-ms-input-placeholder,
+input::placeholder {
+  color: #888 !important;
+  opacity: 1 !important;
+}
+
+/* Fallback for forced-colors mode (Windows High Contrast, etc) */
+@media (forced-colors: active) {
+  .navbar,
+  #navbar,
+  .main-navbar,
+  .footer,
+  #footer,
+  .main-footer,
+  input,
+  textarea,
+  select {
+    forced-color-adjust: none !important;
+    background-color: Canvas !important;
+    color: CanvasText !important;
+    border-color: GrayText !important;
+  }
+}

@@ -8,6 +8,7 @@ interface MockupPreviewProps {
   onElementClick: (element: keyof ColorRoles | 'icon' | 'card_element') => void;
   likedPalettes?: Set<number>;
   toggleLike?: (index: number) => void;
+  fontFamily?: string; // NEW PROP
 }
 
 const featuredPalettes = [
@@ -20,7 +21,8 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
   colorRoles, 
   onElementClick,
   likedPalettes = new Set(),
-  toggleLike = () => {}
+  toggleLike = () => {},
+  fontFamily // NEW PROP
 }) => {
   const { 
     background, primary, accent, text, 
@@ -36,21 +38,21 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
   return (
     <div 
       className="w-full rounded-xl overflow-hidden shadow-xl border cursor-pointer"
-      style={{ backgroundColor: background, borderColor: border }}
+      style={{ backgroundColor: background, borderColor: border, fontFamily: fontFamily || 'inherit' }}
       onClick={() => onElementClick('background')} 
       title="Click to change Background role"
     >
       {/* Header - primary role */}
       <header
         className="px-6 py-4 flex justify-between items-center border-b cursor-pointer relative"
-        style={{ backgroundColor: primary, borderColor: border, color: textOnPrimary }}
+        style={{ backgroundColor: primary, borderColor: border, color: textOnPrimary, fontFamily: fontFamily || 'inherit' }}
         onClick={(e) => { e.stopPropagation(); onElementClick('primary'); }}
         title="Click to change Primary role"
       >
         <div className="flex items-center space-x-3" onClick={(e) => { e.stopPropagation(); onElementClick('textOnPrimary'); }}
               title="Click to change Text on Primary role">
           <Palette className="w-7 h-7" style={{ color: accent }} onClick={(e) => { e.stopPropagation(); onElementClick('accent'); }}/>
-          <div className="font-bold text-xl tracking-tight">
+          <div className="font-bold text-xl tracking-tight" style={{ fontFamily: fontFamily || 'inherit' }}>
             ColorCura
           </div>
         </div>
@@ -72,10 +74,13 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
 
         {/* Desktop navigation - hidden on mobile */}
         <nav className="hidden md:flex items-center space-x-6">
-          {["Explore", "Generate", "Tools", "About"].map((item) => (
+          {[
+            "Explore", "Generate", "Tools", "About"
+          ].map((item) => (
             <div 
               key={item} 
               className="font-medium text-sm hover:opacity-70 cursor-pointer transition-opacity"
+              style={{ fontFamily: fontFamily || 'inherit' }}
               onClick={(e) => { e.stopPropagation(); onElementClick('textOnPrimary'); }}
               title="Click to change Text on Primary role"
             >
@@ -124,16 +129,15 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
         </div>
         <h1 
           className="text-4xl md:text-5xl font-bold mb-5 max-w-4xl leading-tight cursor-pointer"
-          style={{ color: text }} 
+          style={{ color: text, fontFamily: fontFamily || 'inherit' }} 
           onClick={(e) => { e.stopPropagation(); onElementClick('text'); }}
           title="Click to change Text role"
         >
-          Discover & Create Stunning <span style={{ color: accent }} onClick={(e) => { e.stopPropagation(); onElementClick('accent'); }} title="Click to change Accent role">4-Color Palettes</span> Effortlessly
+          Discover & Create Stunning <span style={{ color: accent, fontFamily: fontFamily || 'inherit' }} onClick={(e) => { e.stopPropagation(); onElementClick('accent'); }} title="Click to change Accent role">4-Color Palettes</span> Effortlessly
         </h1>
-        
         <p 
           className="text-lg max-w-3xl mx-auto mb-10 cursor-pointer"
-          style={{ color: text + 'B3' }} 
+          style={{ color: text + 'B3', fontFamily: fontFamily || 'inherit' }} 
           onClick={(e) => { e.stopPropagation(); onElementClick('text'); }}
           title="Click to change Text role"
         >
@@ -217,7 +221,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
                 <div>
                   <h3 
                     className="font-semibold text-lg mb-1 cursor-pointer"
-                    style={{ color: text }} 
+                    style={{ color: text, fontFamily: fontFamily || 'inherit' }} 
                     onClick={(e) => { e.stopPropagation(); onElementClick('text'); }}
                     title="Click to change Text role"
                   >
@@ -276,7 +280,7 @@ const MockupPreview: React.FC<MockupPreviewProps> = ({
       {/* Footer - primary role */}
       <footer 
         className="px-6 py-6 text-center text-sm border-t cursor-pointer"
-        style={{ backgroundColor: primary, color: textOnPrimary + 'A0', borderColor: border }}
+        style={{ backgroundColor: primary, color: textOnPrimary + 'A0', borderColor: border, fontFamily: fontFamily || 'inherit' }}
         onClick={(e) => { e.stopPropagation(); onElementClick('primary'); }}
         title="Click to change Primary role"
       >

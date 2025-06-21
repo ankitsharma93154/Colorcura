@@ -59,6 +59,15 @@ const Navbar: React.FC = () => {
           </Link>
           
           <Link 
+            to="/blog" 
+            className="relative px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 rounded-xl hover:bg-white/60 dark:hover:bg-gray-800/60 backdrop-blur-sm border border-transparent hover:border-white/30 dark:hover:border-gray-600/30 hover:shadow-lg group"
+          >
+            <span className="relative z-10 font-medium">Blogs</span>
+            {/* Subtle gradient background on hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 rounded-xl transition-all duration-300"></div>
+          </Link>
+          
+          <Link 
             to="/about" 
             className="relative px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 rounded-xl hover:bg-white/60 dark:hover:bg-gray-800/60 backdrop-blur-sm border border-transparent hover:border-white/30 dark:hover:border-gray-600/30 hover:shadow-lg group"
           >
@@ -79,6 +88,16 @@ const Navbar: React.FC = () => {
               className="relative px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 rounded-xl hover:bg-white/60 dark:hover:bg-gray-800/60 backdrop-blur-sm border border-transparent hover:border-white/30 dark:hover:border-gray-600/30 hover:shadow-lg group"
             >
               <span className="relative z-10 font-medium">Palettes</span>
+              {/* Subtle gradient background on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 rounded-xl transition-all duration-300"></div>
+            </Link>
+            
+            <Link 
+              to="/blog" 
+              onClick={() => setIsOpen(false)}
+              className="relative px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 rounded-xl hover:bg-white/60 dark:hover:bg-gray-800/60 backdrop-blur-sm border border-transparent hover:border-white/30 dark:hover:border-gray-600/30 hover:shadow-lg group"
+            >
+              <span className="relative z-10 font-medium">Blogs</span>
               {/* Subtle gradient background on hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 rounded-xl transition-all duration-300"></div>
             </Link>

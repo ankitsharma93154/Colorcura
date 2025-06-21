@@ -287,7 +287,7 @@ export const generateGradient = (
 };
 
 // Suggest usage based on the assigned role (Updated for 4-color roles)
-export const getSuggestedUsage = (color: string, role: keyof ColorRoles): string => {
+export const getSuggestedUsage = (role: keyof ColorRoles): string => {
   const roleDescriptions: Record<keyof ColorRoles, string> = {
     background: "Main Background",
     primary: "Primary Surface (Cards, Sections)",
@@ -299,7 +299,5 @@ export const getSuggestedUsage = (color: string, role: keyof ColorRoles): string
   };
   return roleDescriptions[role] || "General Use";
 };
-
-
 
 
