@@ -364,7 +364,7 @@ const HomePage: React.FC = () => {
           <div className="p-6 md:p-8 pb-32 md:pb-6">
             {/* Enhanced Search Bar */}
             <div className="mb-6">
-              <div className="relative w-full max-w-3xl mx-auto">
+              <div className="relative w-full max-w-4xl mx-auto">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
