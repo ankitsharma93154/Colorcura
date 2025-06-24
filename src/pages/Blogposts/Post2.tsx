@@ -6,7 +6,48 @@ const Post2: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>Color Psychology in Web Design: Boost Conversions with the Right Colors</title>
+        <meta name="description" content="Discover how color psychology impacts website conversions. Learn the science, best practices, and real-world strategies to use color for higher engagement and sales." />
+        <meta name="keywords" content="color psychology, website conversions, web design colors, color schemes, branding, color impact, UX, color science" />
         <link rel="canonical" href="https://www.colorcura.site/blog/color-psychology-conversions" />
+        {/* Open Graph */}
+        <meta property="og:title" content="Color Psychology in Web Design: Boost Conversions with the Right Colors" />
+        <meta property="og:description" content="How color choices affect user behavior and conversions. Backed by science and real data." />
+         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/blog/color-psychology-conversions" />
+        <meta property="og:type" content="article" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Color Psychology in Web Design: Boost Conversions" />
+        <meta name="twitter:description" content="How color choices affect user behavior and conversions. Backed by science and real data." />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/color-psychology-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "Color Psychology in Web Design: Boost Conversions with the Right Colors",
+            "description": "Discover how color psychology impacts website conversions. Learn the science, best practices, and real-world strategies to use color for higher engagement and sales.",
+            "author": {
+              "@type": "Organization",
+              "name": "ColorCura"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            },
+            "datePublished": "2025-03-18",
+            "dateModified": "2025-03-18",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://www.colorcura.site/blog/color-psychology-conversions"
+            }
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Image */}

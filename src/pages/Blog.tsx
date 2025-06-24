@@ -42,7 +42,39 @@ const Blog: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>ColorCura Blog – Color Theory, UI Trends & Palette Inspiration</title>
+        <meta name="description" content="Read the latest on color theory, UI/UX trends, palette inspiration, and design tips from the ColorCura team. Stay inspired and informed!" />
+        <meta name="keywords" content="colorcura blog, color theory, palette inspiration, UI trends, web design, color palettes" />
         <link rel="canonical" href="https://www.colorcura.site/blog" />
+        {/* Open Graph */}
+        <meta property="og:title" content="ColorCura Blog – Color Theory, UI Trends & Palette Inspiration" />
+        <meta property="og:description" content="Read the latest on color theory, UI/UX trends, palette inspiration, and design tips from the ColorCura team. Stay inspired and informed!" />
+         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/blog" />
+        <meta property="og:type" content="website" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="ColorCura Blog – Color Theory, UI Trends & Palette Inspiration" />
+        <meta name="twitter:description" content="Read the latest on color theory, UI/UX trends, palette inspiration, and design tips from the ColorCura team. Stay inspired and informed!" />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/colorcura-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "ColorCura Blog",
+            "url": "https://www.colorcura.site/blog",
+            "description": "Read the latest on color theory, UI/UX trends, palette inspiration, and design tips from the ColorCura team. Stay inspired and informed!",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            }
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Section */}

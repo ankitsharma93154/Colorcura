@@ -7,34 +7,49 @@ interface ColorData {
   label: string;
 }
 
-interface ColorPaletteData { // Renamed to avoid conflict with component name
+interface ColorPaletteData {
   title: string;
   description: string;
   colors: ColorData[];
+  trend?: string;
 }
 
-// Interface for ColorSwatch component props
 interface ColorSwatchProps {
   color: string;
   label: string;
 }
 
-// Memoized ColorSwatch
 const ColorSwatch = React.memo(({ color, label }: ColorSwatchProps) => {
-  const [isHovered, setIsHovered] = useState<boolean>(false); // Explicitly typed useState
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const handleClick = async () => {
+    try {
+      await navigator.clipboard.writeText(color);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy color code');
+    }
+  };
 
   return (
     <div
-      className="flex-1 h-16 relative cursor-pointer transition-transform duration-200 hover:scale-105"
+      className="flex-1 h-16 relative cursor-pointer transition-all duration-300 hover:scale-105 hover:z-10 hover:shadow-lg"
       style={{ backgroundColor: color }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
+      title={`Click to copy ${color}`}
     >
-      {isHovered && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+      {(isHovered || copied) && (
+        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center transition-all duration-200">
           <div className="text-white text-xs font-mono text-center">
             <div className="font-semibold">{label}</div>
-            <div>{color}</div>
+            <div className="mb-1">{color}</div>
+            <div className="text-xs opacity-75">
+              {copied ? '✓ Copied!' : 'Click to copy'}
+            </div>
           </div>
         </div>
       )}
@@ -42,476 +57,562 @@ const ColorSwatch = React.memo(({ color, label }: ColorSwatchProps) => {
   );
 });
 
-// Interface for ColorPalette component props
 interface ColorPaletteProps {
   title: string;
   description: string;
   colors: ColorData[];
+  trend?: string;
 }
 
-// Memoized ColorPalette
-const ColorPalette = React.memo(({ title, description, colors }: ColorPaletteProps) => {
+const ColorPalette = React.memo(({ title, description, colors, trend }: ColorPaletteProps) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-      <h4 className="text-xl font-semibold text-gray-800 mb-3">{title}</h4>
-      <p className="text-gray-600 mb-4">{description}</p>
-      <div className="flex rounded-lg overflow-hidden shadow-md">
-        {colors.map((colorData) => (
-          <ColorSwatch key={colorData.color} color={colorData.color} label={colorData.label} />
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 mb-6 border border-gray-100">
+      <div className="flex items-start justify-between mb-3">
+        <h4 className="text-xl font-bold text-gray-800">{title}</h4>
+        {trend && (
+          <span className="text-xs bg-gradient-to-r from-pink-500 to-violet-500 text-white px-2 py-1 rounded-full font-medium">
+            {trend}
+          </span>
+        )}
+      </div>
+      <p className="text-gray-600 mb-4 leading-relaxed">{description}</p>
+      <div className="flex rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+        {colors.map((colorData, index) => (
+          <ColorSwatch key={`${colorData.color}-${index}`} color={colorData.color} label={colorData.label} />
         ))}
       </div>
     </div>
   );
 });
 
-
 const Post1 = () => {
-  const trustReliabilityPalettes = [
+  // Dramatically different and trendy palettes
+  const trendingPalettes = [
     {
-      title: "Corporate Confidence",
-      description: "Professional and trustworthy for enterprise websites",
+      title: "Cyberpunk Neon",
+      description: "Electric and futuristic - perfect for gaming, tech startups, and crypto platforms",
+      trend: "🔥 HOT",
       colors: [
-        { color: "#1E3A8A", label: "Primary" },
-        { color: "#3B82F6", label: "Secondary" },
-        { color: "#F1F5F9", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
+        { color: "#FF00FF", label: "Neon Pink" },
+        { color: "#00FFFF", label: "Cyber Blue" },
+        { color: "#0D0D0D", label: "Deep Black" },
+        { color: "#39FF14", label: "Matrix Green" }
       ]
     },
     {
-      title: "Tech Innovation",
-      description: "Modern and cutting-edge for technology companies",
+      title: "Sunset Gradient",
+      description: "Instagram-worthy gradients that convert - ideal for lifestyle brands and apps",
+      trend: "📈 VIRAL",
       colors: [
-        { color: "#0EA5E9", label: "Primary" },
-        { color: "#06B6D4", label: "Secondary" },
-        { color: "#F0F9FF", label: "Accent" },
-        { color: "#0F172A", label: "Text" }
+        { color: "#FF6B6B", label: "Coral" },
+        { color: "#4ECDC4", label: "Turquoise" },
+        { color: "#45B7D1", label: "Sky Blue" },
+        { color: "#F7DC6F", label: "Golden" }
       ]
     },
     {
-      title: "Financial Trust",
-      description: "Stable and secure for banking and finance",
+      title: "Dark Mode Premium",
+      description: "Sophisticated dark theme that reduces eye strain and looks premium",
+      trend: "⭐ PRO",
       colors: [
-        { color: "#1E40AF", label: "Primary" },
-        { color: "#2563EB", label: "Secondary" },
-        { color: "#EFF6FF", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
+        { color: "#1A1A1A", label: "Rich Black" },
+        { color: "#BB86FC", label: "Purple Accent" },
+        { color: "#03DAC6", label: "Teal Accent" },
+        { color: "#FFFFFF", label: "Pure White" }
       ]
     },
     {
-      title: "Healthcare Professional",
-      description: "Clean and reliable for medical websites",
+      title: "Retro Miami Vice",
+      description: "80s-inspired palette that's making a huge comeback in 2025",
+      trend: "🕺 RETRO",
       colors: [
-        { color: "#1E3A8A", label: "Primary" },
-        { color: "#60A5FA", label: "Secondary" },
-        { color: "#F8FAFC", label: "Accent" },
-        { color: "#0F172A", label: "Text" }
+        { color: "#FF0080", label: "Hot Pink" },
+        { color: "#00BFFF", label: "Electric Blue" },
+        { color: "#1A0033", label: "Deep Purple" },
+        { color: "#FFD700", label: "Neon Gold" }
       ]
     }
   ];
 
-  const energyActionPalettes = [
+  const brandingPalettes = [
     {
-      title: "Startup Energy",
-      description: "Bold and dynamic for innovative startups",
+      title: "Apple Inspired Clean",
+      description: "Minimalist perfection that Apple popularized - works for any premium brand",
       colors: [
-        { color: "#EA580C", label: "Primary" },
-        { color: "#DC2626", label: "Secondary" },
-        { color: "#FEF3C7", label: "Accent" },
-        { color: "#292524", label: "Text" }
+        { color: "#000000", label: "True Black" },
+        { color: "#007AFF", label: "iOS Blue" },
+        { color: "#F2F2F7", label: "System Gray" },
+        { color: "#FFFFFF", label: "Pure White" }
       ]
     },
     {
-      title: "Creative Fire",
-      description: "Vibrant and inspiring for creative agencies",
+      title: "Spotify Green Energy",
+      description: "Bold and energetic - perfect for music, entertainment, and social platforms",
       colors: [
-        { color: "#F97316", label: "Primary" },
-        { color: "#EF4444", label: "Secondary" },
-        { color: "#FFF7ED", label: "Accent" },
-        { color: "#451A03", label: "Text" }
+        { color: "#1DB954", label: "Spotify Green" },
+        { color: "#191414", label: "Deep Black" },
+        { color: "#1ED760", label: "Bright Green" },
+        { color: "#FFFFFF", label: "Clean White" }
       ]
     },
     {
-      title: "E-commerce Conversion",
-      description: "High-converting colors for online stores",
+      title: "Netflix Drama",
+      description: "Dramatic and attention-grabbing - ideal for media and entertainment",
       colors: [
-        { color: "#DC2626", label: "Primary" },
-        { color: "#F97316", label: "Secondary" },
-        { color: "#FEF2F2", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
+        { color: "#E50914", label: "Netflix Red" },
+        { color: "#000000", label: "Cinema Black" },
+        { color: "#564D4D", label: "Charcoal" },
+        { color: "#FFFFFF", label: "Screen White" }
       ]
     },
     {
-      title: "Fitness Motivation",
-      description: "Energetic and motivating for fitness brands",
+      title: "Slack Productivity",
+      description: "Professional yet friendly - perfect for SaaS and productivity tools",
       colors: [
-        { color: "#EA580C", label: "Primary" },
-        { color: "#F59E0B", label: "Secondary" },
-        { color: "#FFF7ED", label: "Accent" },
-        { color: "#292524", label: "Text" }
+        { color: "#4A154B", label: "Slack Purple" },
+        { color: "#36C5F0", label: "Sky Blue" },
+        { color: "#2EB67D", label: "Green" },
+        { color: "#ECB22E", label: "Yellow" }
       ]
     }
   ];
 
-  const professionalPalettes = [
+  const emotionalPalettes = [
     {
-      title: "Executive Suite",
-      description: "Sophisticated and premium for executive services",
+      title: "Calm Meditation",
+      description: "Zen-like tranquility for wellness, meditation, and mental health apps",
       colors: [
-        { color: "#374151", label: "Primary" },
-        { color: "#6B7280", label: "Secondary" },
-        { color: "#F9FAFB", label: "Accent" },
-        { color: "#111827", label: "Text" }
+        { color: "#E8F5E8", label: "Soft Mint" },
+        { color: "#A8E6CF", label: "Sage Green" },
+        { color: "#88D8C0", label: "Aqua" },
+        { color: "#2E8B57", label: "Forest" }
       ]
     },
     {
-      title: "Modern Professional",
-      description: "Contemporary and sleek for modern businesses",
+      title: "Energetic Workout",
+      description: "High-energy colors that motivate action - perfect for fitness and sports",
       colors: [
-        { color: "#1F2937", label: "Primary" },
-        { color: "#4F46E5", label: "Secondary" },
-        { color: "#E5E7EB", label: "Accent" },
-        { color: "#0F172A", label: "Text" }
+        { color: "#FF4500", label: "Energy Orange" },
+        { color: "#32CD32", label: "Lime Green" },
+        { color: "#1E90FF", label: "Electric Blue" },
+        { color: "#FFD700", label: "Victory Gold" }
       ]
     },
     {
-      title: "Minimalist Corporate",
-      description: "Clean and focused for corporate websites",
+      title: "Romantic Valentine",
+      description: "Soft and romantic - ideal for dating apps, weddings, and lifestyle brands",
       colors: [
-        { color: "#374151", label: "Primary" },
-        { color: "#9CA3AF", label: "Secondary" },
-        { color: "#F3F4F6", label: "Accent" },
-        { color: "#111827", label: "Text" }
+        { color: "#FFB6C1", label: "Blush Pink" },
+        { color: "#DDA0DD", label: "Plum" },
+        { color: "#F0E68C", label: "Champagne" },
+        { color: "#8B008B", label: "Deep Magenta" }
+      ]
+    },
+    {
+      title: "Mysterious Gothic",
+      description: "Dark and intriguing - perfect for fashion, art, and creative portfolios",
+      colors: [
+        { color: "#2F0A30", label: "Dark Plum" },
+        { color: "#8B0000", label: "Blood Red" },
+        { color: "#4B0082", label: "Indigo" },
+        { color: "#C0C0C0", label: "Silver" }
       ]
     }
   ];
 
-  const creativeColorfulPalettes = [
+  const industrySpecificPalettes = [
     {
-      title: "Creative Studio",
-      description: "Vibrant and artistic for creative portfolios",
+      title: "Crypto Trading",
+      description: "Sharp and digital - perfect for cryptocurrency and fintech platforms",
       colors: [
-        { color: "#7C3AED", label: "Primary" },
-        { color: "#EC4899", label: "Secondary" },
-        { color: "#FDF4FF", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
+        { color: "#F7931A", label: "Bitcoin Orange" },
+        { color: "#627EEA", label: "Ethereum Blue" },
+        { color: "#1A1A1A", label: "Trading Black" },
+        { color: "#00D4AA", label: "Profit Green" }
       ]
     },
     {
-      title: "Design Agency",
-      description: "Bold and innovative for design agencies",
+      title: "Food & Restaurant",
+      description: "Appetizing and warm - makes people hungry and drives food orders",
       colors: [
-        { color: "#8B5CF6", label: "Primary" },
-        { color: "#06B6D4", label: "Secondary" },
-        { color: "#F0F9FF", label: "Accent" },
-        { color: "#0F172A", label: "Text" }
+        { color: "#FF6B35", label: "Paprika" },
+        { color: "#F7931E", label: "Saffron" },
+        { color: "#8B4513", label: "Cinnamon" },
+        { color: "#228B22", label: "Fresh Basil" }
       ]
     },
     {
-      title: "Art Gallery",
-      description: "Sophisticated and artistic for galleries",
+      title: "Travel Adventure",
+      description: "Wanderlust-inspiring - perfect for travel agencies and booking platforms",
       colors: [
-        { color: "#7C2D12", label: "Primary" },
-        { color: "#F59E0B", label: "Secondary" },
-        { color: "#FFFBEB", label: "Accent" },
-        { color: "#1C1917", label: "Text" }
+        { color: "#87CEEB", label: "Sky Blue" },
+        { color: "#228B22", label: "Forest Green" },
+        { color: "#F4A460", label: "Sandy Brown" },
+        { color: "#FFD700", label: "Sunset Gold" }
       ]
     },
     {
-      title: "Photography Studio",
-      description: "Elegant and visual for photographers",
+      title: "Beauty & Cosmetics",
+      description: "Elegant and feminine - converts well for beauty and fashion brands",
       colors: [
-        { color: "#1F2937", label: "Primary" },
-        { color: "#F59E0B", label: "Secondary" },
-        { color: "#F9FAFB", label: "Accent" },
-        { color: "#111827", label: "Text" }
+        { color: "#FF69B4", label: "Hot Pink" },
+        { color: "#DDA0DD", label: "Plum" },
+        { color: "#FFD700", label: "Gold" },
+        { color: "#2E2E2E", label: "Charcoal" }
       ]
     }
   ];
 
-  const natureSustainabilityPalettes = [
+  const seasonalPalettes = [
     {
-      title: "Eco-Friendly",
-      description: "Natural and sustainable for green businesses",
+      title: "Spring Fresh",
+      description: "New beginnings and growth - perfect for launches and fresh brands",
       colors: [
-        { color: "#059669", label: "Primary" },
-        { color: "#10B981", label: "Secondary" },
-        { color: "#ECFDF5", label: "Accent" },
-        { color: "#064E3B", label: "Text" }
+        { color: "#98FB98", label: "Mint Green" },
+        { color: "#FFB6C1", label: "Cherry Blossom" },
+        { color: "#87CEFA", label: "Light Blue" },
+        { color: "#F0E68C", label: "Soft Yellow" }
       ]
     },
     {
-      title: "Organic Products",
-      description: "Fresh and natural for organic brands",
+      title: "Summer Vibes",
+      description: "Fun and energetic - great for entertainment and lifestyle brands",
       colors: [
-        { color: "#16A34A", label: "Primary" },
-        { color: "#84CC16", label: "Secondary" },
-        { color: "#F0FDF4", label: "Accent" },
-        { color: "#14532D", label: "Text" }
+        { color: "#FF6347", label: "Tomato Red" },
+        { color: "#40E0D0", label: "Turquoise" },
+        { color: "#FFD700", label: "Sun Yellow" },
+        { color: "#FF69B4", label: "Flamingo Pink" }
+      ]
+    },
+    {
+      title: "Autumn Harvest",
+      description: "Warm and cozy - perfect for food, home, and comfort brands",
+      colors: [
+        { color: "#D2691E", label: "Burnt Orange" },
+        { color: "#8B4513", label: "Saddle Brown" },
+        { color: "#CD853F", label: "Peru" },
+        { color: "#A0522D", label: "Sienna" }
+      ]
+    },
+    {
+      title: "Winter Frost",
+      description: "Cool and sophisticated - ideal for luxury and premium brands",
+      colors: [
+        { color: "#4682B4", label: "Steel Blue" },
+        { color: "#C0C0C0", label: "Silver" },
+        { color: "#191970", label: "Midnight Blue" },
+        { color: "#F0F8FF", label: "Alice Blue" }
       ]
     }
   ];
 
-  const luxuryPremiumPalettes = [
+  const futuristicPalettes = [
     {
-      title: "Luxury Gold",
-      description: "Elegant and premium for luxury brands",
+      title: "AI Hologram",
+      description: "Futuristic and tech-forward - perfect for AI, robotics, and sci-fi brands",
+      trend: "🤖 AI",
       colors: [
-        { color: "#1F2937", label: "Primary" },
-        { color: "#F59E0B", label: "Secondary" },
-        { color: "#FFFBEB", label: "Accent" },
-        { color: "#111827", label: "Text" }
+        { color: "#00FFFF", label: "Cyan Glow" },
+        { color: "#FF00FF", label: "Magenta Beam" },
+        { color: "#0A0A0A", label: "Void Black" },
+        { color: "#FFFFFF", label: "Pure Light" }
       ]
     },
     {
-      title: "Royal Purple",
-      description: "Regal and sophisticated for premium services",
+      title: "Space Exploration",
+      description: "Cosmic and infinite - ideal for aerospace, astronomy, and innovation",
+      trend: "🚀 SPACE",
       colors: [
-        { color: "#581C87", label: "Primary" },
-        { color: "#7C3AED", label: "Secondary" },
-        { color: "#FAF5FF", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
+        { color: "#4B0082", label: "Deep Space" },
+        { color: "#9400D3", label: "Cosmic Violet" },
+        { color: "#FF1493", label: "Star Pink" },
+        { color: "#00CED1", label: "Nebula Turquoise" }
+      ]
+    },
+    {
+      title: "Neon Tokyo",
+      description: "Cyberpunk meets Japanese aesthetic - trending in gaming and tech",
+      trend: "🌃 CYBER",
+      colors: [
+        { color: "#FF0080", label: "Neon Pink" },
+        { color: "#00FF41", label: "Matrix Green" },
+        { color: "#0D1117", label: "Tokyo Night" },
+        { color: "#FFD700", label: "Electric Gold" }
       ]
     }
   ];
 
-  const technologySaasPalettes = [
-    {
-      title: "SaaS Dashboard",
-      description: "Clean and functional for software interfaces",
-      colors: [
-        { color: "#4F46E5", label: "Primary" },
-        { color: "#06B6D4", label: "Secondary" },
-        { color: "#F8FAFC", label: "Accent" },
-        { color: "#0F172A", label: "Text" }
-      ]
-    },
-    {
-      title: "Fintech Innovation",
-      description: "Modern and trustworthy for financial technology",
-      colors: [
-        { color: "#1E40AF", label: "Primary" },
-        { color: "#10B981", label: "Secondary" },
-        { color: "#F0F9FF", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
-      ]
-    }
-  ];
-
-  const ecommercePalettes = [
-    {
-      title: "Fashion E-commerce",
-      description: "Stylish and conversion-focused for fashion stores",
-      colors: [
-        { color: "#1F2937", label: "Primary" },
-        { color: "#EC4899", label: "Secondary" },
-        { color: "#FDF2F8", label: "Accent" },
-        { color: "#111827", label: "Text" }
-      ]
-    },
-    {
-      title: "Electronics Store",
-      description: "Modern and tech-savvy for electronics",
-      colors: [
-        { color: "#1E40AF", label: "Primary" },
-        { color: "#F59E0B", label: "Secondary" },
-        { color: "#EFF6FF", label: "Accent" },
-        { color: "#1F2937", label: "Text" }
-      ]
-    }
-  ];
-
-  // In the main component, memoize palette mapping
   const renderPalette = useCallback((palette: ColorPaletteData, index: number) => (
-    <ColorPalette key={index} {...palette} />
+    <ColorPalette key={`${palette.title}-${index}`} {...palette} />
   ), []);
 
   return (
     <>
       <Helmet>
+        <title>20+ Stunning Website Color Schemes 2025 | Interactive Color Palettes</title>
+        <meta name="description" content="Discover 20+ trending website color schemes for 2025. Interactive palettes with hex codes, psychology tips, and conversion-optimized combinations. Copy colors instantly!" />
+        <meta name="keywords" content="website color schemes, color palettes 2025, web design colors, UI color combinations, brand colors, hex codes, color psychology" />
         <link rel="canonical" href="https://www.colorcura.site/blog/website-color-schemes-2025" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="20+ Stunning Website Color Schemes 2025 | Interactive Palettes" />
+        <meta property="og:description" content="Trending website color schemes with interactive palettes. Click to copy hex codes instantly!" />
+         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/blog/website-color-schemes-2025" />
+        <meta property="og:type" content="article" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="20+ Stunning Website Color Schemes 2025" />
+        <meta name="twitter:description" content="Interactive color palettes for web design. Click to copy hex codes!" />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/color-schemes-twitter.jpg" />
+        
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "20+ Best Website Color Schemes for 2025 (Interactive Palettes)",
+            "description": "Comprehensive guide to trending website color schemes with interactive palettes and psychology insights",
+            "author": {
+              "@type": "Organization",
+              "name": "ColorCura"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            },
+            "datePublished": "2025-03-15",
+            "dateModified": "2025-03-15",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://www.colorcura.site/blog/website-color-schemes-2025"
+            }
+          })}
+        </script>
       </Helmet>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header Image */}
-        <div className="w-full h-64 md:h-80 bg-gradient-to-r from-blue-600 to-purple-600 relative overflow-hidden">
-          <img 
-            src="/images/Header1.webp" 
-            alt="Website Color Schemes Header" 
-            className="w-full h-full object-cover opacity-80"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        {/* Dynamic Header */}
+        <div className="w-full h-64 md:h-80 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-white text-center px-6">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+                20+ Trending Color Schemes
+              </h1>
+              <p className="text-xl md:text-2xl opacity-90">
+                Click any color to copy • Updated for 2025
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Content Container */}
-        <div className="max-w-5xl mx-auto px-6 py-12">
-          {/* Title and Metadata */}
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          {/* SEO-Optimized Header */}
           <header className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              20+ Best Website Color Schemes for 2025 (With Interactive Palettes)
-            </h1>
             <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-8">
+              <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                🎨 TRENDING
+              </span>
               <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                Design
+                Web Design
               </span>
-              <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                Color Theory
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                Color Psychology
               </span>
-              <span className="text-sm">Published on March 15, 2025</span>
-              <span className="text-sm">12 min read</span>
+              <span className="text-sm">Updated March 2025</span>
+              <span className="text-sm">15 min read</span>
             </div>
           </header>
 
-          {/* Article Content */}
-          <article className="prose prose-lg max-w-none">
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <p className="text-xl text-gray-700 leading-relaxed mb-6">
-                Choosing the perfect color scheme for your website can make or break your user experience. The right colors don't just look good—they build trust, guide user behavior, and significantly impact conversion rates. In 2025, successful websites are embracing bold contrasts, accessible combinations, and psychologically-driven palettes that resonate with their target audience.
-              </p>
-              <p className="text-gray-700 leading-relaxed">
-                This comprehensive guide showcases over 50 carefully curated website color schemes with interactive visual palettes. Hover over any color to see its hex code. Whether you're designing a SaaS platform, e-commerce store, or creative portfolio, you'll find the perfect palette to elevate your brand.
+          {/* SEO-Rich Introduction */}
+          <section className="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <p className="text-xl text-gray-700 leading-relaxed mb-6">
+              Choosing the perfect color scheme for your website can make or break your user experience. The right colors don't just look good—they build trust, guide user behavior, and significantly impact conversion rates. In 2025, successful websites are embracing bold contrasts, accessible combinations, and psychologically-driven palettes that resonate with their target audience.
+            </p>
+            <p className="text-gray-700 leading-relaxed">
+              This comprehensive guide showcases over 50 carefully curated website color schemes with interactive visual palettes. Hover over any color to see its hex code. Whether you're designing a SaaS platform, e-commerce store, or creative portfolio, you'll find the perfect palette to elevate your brand.
+            </p>
+          </section>
+
+          {/* Why Website Color Schemes Matter More Than Ever */}
+          <section className="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Website Color Schemes Matter More Than Ever</h2>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              Modern users form opinions about websites within 50 milliseconds—and color plays a crucial role in that split-second judgment. Research shows that color increases brand recognition by up to 80%, while poor color choices can reduce readability and drive visitors away.
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              In 2025, successful color schemes must balance three critical factors:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
+              <li><strong>Accessibility compliance</strong> with WCAG 2.1 guidelines</li>
+              <li><strong>Psychological impact</strong> that aligns with brand goals</li>
+              <li><strong>Cross-device consistency</strong> across desktop, mobile, and tablet</li>
+            </ul>
+          </section>
+
+          {/* Trending Section - Hook readers immediately */}
+          <section className="mb-16">
+            <div className="bg-gradient-to-r from-pink-500 to-violet-600 rounded-2xl p-8 text-white mb-8">
+              <h2 className="text-3xl font-bold mb-4">🔥 Trending Color Schemes That Convert</h2>
+              <p className="text-xl opacity-95 leading-relaxed">
+                These viral color combinations are driving 40% higher engagement rates in 2025. 
+                Each palette includes psychological insights and conversion optimization tips.
               </p>
             </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Website Color Schemes Matter More Than Ever</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Modern users form opinions about websites within 50 milliseconds—and color plays a crucial role in that split-second judgment. Research shows that color increases brand recognition by up to 80%, while poor color choices can reduce readability and drive visitors away.
-              </p>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                In 2025, successful color schemes must balance three critical factors:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
-                <li><strong>Accessibility compliance</strong> with WCAG 2.1 guidelines</li>
-                <li><strong>Psychological impact</strong> that aligns with brand goals</li>
-                <li><strong>Cross-device consistency</strong> across desktop, mobile, and tablet</li>
-              </ul>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {trendingPalettes.map(renderPalette)}
             </div>
+          </section>
 
-            {/* Trust & Reliability Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Trust & Reliability: Blue-Based Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Blue remains the most trusted color in digital design, with 57% of users associating it with reliability and professionalism. Perfect for corporate websites, financial services, and healthcare platforms.
+          {/* Brand-Inspired Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">🏆 Brand-Inspired Color Schemes</h2>
+              <p className="text-xl text-gray-700 leading-relaxed">
+                Learn from billion-dollar brands. These palettes are inspired by companies that have mastered color psychology for maximum impact and recognition.
               </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {trustReliabilityPalettes.map(renderPalette)}
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {brandingPalettes.map(renderPalette)}
+            </div>
+          </section>
+
+          {/* Emotional Impact Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">💫 Emotional Impact Color Schemes</h2>
+              <p className="text-xl text-gray-700 leading-relaxed">
+                Colors trigger emotions before conscious thought. Use these psychologically-designed palettes to create the exact feeling you want your visitors to experience.
+              </p>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {emotionalPalettes.map(renderPalette)}
+            </div>
+          </section>
+
+          {/* Industry-Specific Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">🎯 Industry-Specific Color Schemes</h2>
+              <p className="text-xl text-gray-700 leading-relaxed">
+                Different industries have color expectations that users subconsciously trust. These palettes are optimized for specific markets and have proven conversion rates.
+              </p>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {industrySpecificPalettes.map(renderPalette)}
+            </div>
+          </section>
+
+          {/* Seasonal Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">🌟 Seasonal Color Schemes</h2>
+              <p className="text-xl text-gray-700 leading-relaxed">
+                Tap into seasonal psychology with these time-sensitive palettes. Perfect for campaigns, product launches, and seasonal marketing pushes.
+              </p>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {seasonalPalettes.map(renderPalette)}
+            </div>
+          </section>
+
+          {/* Futuristic Section */}
+          <section className="mb-16">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+              <h2 className="text-3xl font-bold mb-4">🚀 Futuristic Color Schemes</h2>
+              <p className="text-xl opacity-95 leading-relaxed">
+                Next-generation palettes for cutting-edge brands. These schemes signal innovation, technology leadership, and forward-thinking vision.
+              </p>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {futuristicPalettes.map(renderPalette)}
+            </div>
+          </section>
+
+          {/* Quick Implementation Guide Section */}
+          <section className="mb-16">
+            <div className="bg-gray-900 rounded-2xl p-8 text-white mb-8 shadow-lg">
+              <h2 className="text-3xl font-bold mb-6">⚡ Quick Implementation Guide</h2>
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-cyan-400">CSS Variables Setup</h3>
+                  <div className="bg-black rounded-lg p-4 font-mono text-sm shadow-md">
+                    <pre className="text-green-400">{`:root {
+  --primary: #FF00FF;
+  --secondary: #00FFFF;
+  --accent: #39FF14;
+  --bg: #0D0D0D;
+  --text: #FFFFFF;
+}`}</pre>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-pink-400">Accessibility Check</h3>
+                  <ul className="space-y-2 text-gray-300">
+                    <li>✓ 4.5:1 contrast ratio minimum</li>
+                    <li>✓ Test with color blindness filters</li>
+                    <li>✓ Check mobile readability</li>
+                    <li>✓ Validate with WCAG tools</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-6 shadow-md">
+                <h3 className="text-xl font-semibold mb-3 text-yellow-400">Pro Tips for Maximum Impact</h3>
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <h4 className="font-semibold text-blue-400 mb-2">Conversion Boost</h4>
+                    <p className="text-gray-300">Use warm colors (red, orange) for CTAs. They increase urgency and action.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-green-400 mb-2">Trust Building</h4>
+                    <p className="text-gray-300">Blue builds trust. Use it for headers, navigation, and important content.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-purple-400 mb-2">Brand Memory</h4>
+                    <p className="text-gray-300">Unique color combinations increase brand recall by 80%.</p>
+                  </div>
+                </div>
               </div>
             </div>
+          </section>
 
-            {/* Energy & Action Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Energy & Action: Warm Color Combinations</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Warm colors drive action and create urgency—perfect for e-commerce, startups, and call-to-action elements. These palettes boost conversion rates and create emotional connections.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {energyActionPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* Professional Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Professional Website Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Clean, sophisticated schemes that work across industries. These minimalist palettes convey professionalism while maintaining visual interest and brand personality.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {professionalPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* Creative & Colorful Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Creative & Artistic Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Bold and expressive palettes for creative industries. These schemes make strong visual statements while maintaining usability and brand coherence.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {creativeColorfulPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* Nature & Sustainability Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Nature & Sustainability Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Earth-inspired palettes that convey growth, sustainability, and natural wellness. Perfect for eco-friendly brands, outdoor companies, and health-focused businesses.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {natureSustainabilityPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* Luxury & Premium Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Luxury & Premium Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Sophisticated palettes that convey exclusivity and premium quality. These schemes work perfectly for luxury brands, high-end services, and premium products.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {luxuryPremiumPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* Technology & SaaS Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Technology & SaaS Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Modern and innovative palettes for tech companies and software platforms. These schemes balance trust with innovation, perfect for dashboards and digital products.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {technologySaasPalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            {/* E-commerce Section */}
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">E-commerce Color Schemes</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                Conversion-optimized palettes for online stores. These schemes are designed to build trust, highlight products, and drive purchasing decisions across different retail categories.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {ecommercePalettes.map(renderPalette)}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+          {/* Implementation Best Practices Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Implementation Best Practices</h2>
-              
               <h3 className="text-2xl font-semibold text-gray-800 mb-4">CSS Custom Properties</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Organize your color scheme using CSS variables for easy maintenance:
               </p>
-              
-              <div className="bg-gray-900 rounded-lg p-6 mb-6 overflow-x-auto">
-                <pre className="text-green-400 text-sm">
-{`:root {
+              <div className="bg-gray-900 rounded-lg p-6 mb-6 overflow-x-auto shadow-md">
+                <pre className="text-green-400 text-sm">{`:root {
   --primary-color: #1E3A8A;
   --secondary-color: #3B82F6;
   --accent-color: #F1F5F9;
   --text-color: #1F2937;
   --background-color: #FFFFFF;
-}`}
-                </pre>
+}`}</pre>
               </div>
-
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Color Naming Conventions</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Color Naming Conventions</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Use semantic naming that describes function, not appearance:
               </p>
-              
-              <div className="bg-gray-900 rounded-lg p-6 mb-6 overflow-x-auto">
-                <pre className="text-green-400 text-sm">
-{`:root {
+              <div className="bg-gray-900 rounded-lg p-6 mb-6 overflow-x-auto shadow-md">
+                <pre className="text-green-400 text-sm">{`:root {
   --color-brand-primary: #1E3A8A;
   --color-interactive-primary: #3B82F6;
   --color-surface-primary: #F1F5F9;
   --color-text-primary: #1F2937;
-}`}
-                </pre>
+}`}</pre>
               </div>
-
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Accessibility Testing</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Accessibility Testing</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Always test your color combinations for WCAG compliance:
               </p>
@@ -522,26 +623,27 @@ const Post1 = () => {
                 <li>Ensure functionality without color dependence</li>
               </ul>
             </div>
+          </section>
 
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+          {/* How to Choose the Right Palette Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">How to Choose the Right Palette</h2>
-              
               <h3 className="text-2xl font-semibold text-gray-800 mb-4">Consider Your Industry</h3>
               <p className="text-gray-700 leading-relaxed mb-6">
                 Different industries have color expectations that users subconsciously associate with trust and credibility:
               </p>
               <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-blue-50 p-4 rounded-lg shadow-md">
                   <h4 className="font-semibold text-blue-800 mb-2">Conservative Industries</h4>
                   <p className="text-blue-700 text-sm">Finance, legal, healthcare - stick with blues, grays, and conservative palettes</p>
                 </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
+                <div className="bg-orange-50 p-4 rounded-lg shadow-md">
                   <h4 className="font-semibold text-orange-800 mb-2">Creative Industries</h4>
                   <p className="text-orange-700 text-sm">Design, art, entertainment - embrace bold colors and creative combinations</p>
                 </div>
               </div>
-
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Test Before Implementing</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Test Before Implementing</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Before committing to a color scheme:
               </p>
@@ -553,71 +655,42 @@ const Post1 = () => {
                 <li>Check performance in different lighting conditions</li>
               </ul>
             </div>
+          </section>
 
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Color Psychology Quick Reference</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Blue</h4>
-                  <p className="text-gray-600 text-sm">Trust, reliability, professionalism, calm</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Red</h4>
-                  <p className="text-gray-600 text-sm">Energy, urgency, passion, action</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Green</h4>
-                  <p className="text-gray-600 text-sm">Growth, nature, money, go/success</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Orange</h4>
-                  <p className="text-gray-600 text-sm">Enthusiasm, creativity, warmth, affordable</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Purple</h4>
-                  <p className="text-gray-600 text-sm">Luxury, creativity, wisdom, mystery</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-500 rounded-full mx-auto mb-3"></div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Gray</h4>
-                  <p className="text-gray-600 text-sm">Neutral, professional, sophisticated, timeless</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+          {/* Tools for Color Scheme Development Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Tools for Color Scheme Development</h2>
               <p className="text-gray-700 leading-relaxed mb-6">
                 Professional designers use these tools to create and refine color palettes:
               </p>
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-4 rounded-lg shadow-md">
                   <h4 className="font-semibold text-gray-800 mb-2">Color Palette Generators</h4>
                   <ul className="text-gray-600 text-sm space-y-1">
-                    <li>• Adobe Color (color.adobe.com)</li>
-                    <li>• Coolors.co</li>
-                    <li>• Material Design Color Tool</li>
-                    <li>• Paletton.com</li>
+                    <li>• <a href="https://www.colorcura.site" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">ColorCura</a> (offers curated palettes and live UI mockup)</li>
+                    <li>• <a href="https://color.adobe.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Adobe Color</a></li>
+                    <li>• <a href="https://coolors.co/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Coolors.co</a></li>
+                    <li>• <a href="https://material.io/resources/color/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Material Design Color Tool</a></li>
+                    <li>• <a href="https://paletton.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Paletton.com</a></li>
                   </ul>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-gray-50 p-4 rounded-lg shadow-md">
                   <h4 className="font-semibold text-gray-800 mb-2">Accessibility Checkers</h4>
                   <ul className="text-gray-600 text-sm space-y-1">
-                    <li>• WebAIM Contrast Checker</li>
-                    <li>• Colour Contrast Analyser</li>
-                    <li>• Stark (Figma/Sketch plugin)</li>
-                    <li>• WAVE Web Accessibility Evaluator</li>
+                    <li>• <a href="https://webaim.org/resources/contrastchecker/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">WebAIM Contrast Checker</a></li>
+                    <li>• <a href="https://www.tpgi.com/color-contrast-checker/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Colour Contrast Analyser</a></li>
+                    <li>• <a href="https://www.getstark.co/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Stark (Figma/Sketch plugin)</a></li>
+                    <li>• <a href="https://wave.webaim.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">WAVE Web Accessibility Evaluator</a></li>
                   </ul>
                 </div>
               </div>
             </div>
+          </section>
 
-            <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+          {/* Conclusion Section */}
+          <section className="mb-16">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Conclusion</h2>
               <p className="text-gray-700 leading-relaxed mb-6">
                 The perfect color scheme combines aesthetic appeal with psychological impact and technical accessibility. In 2025, successful websites prioritize user experience through thoughtful color choices that enhance readability, guide user behavior, and reinforce brand identity.
@@ -630,19 +703,7 @@ const Post1 = () => {
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white text-center">
-              <h3 className="text-2xl font-bold mb-4">Ready to implement your perfect color scheme?</h3>
-              <p className="text-lg font-medium mb-4">
-                These 50+ palettes give you the foundation for creating stunning, conversion-focused websites that resonate with your audience.
-              </p>
-              <p className="text-sm opacity-90">
-                Hover over any color above to copy its hex code and start building your brand's visual identity today.
-              </p>
-            </div>
-          </article>
-
-          {/* Back to Blog Link */}
-          <div className="mt-16 pt-8 border-t border-gray-200">
+            <div className="mt-16 pt-8 border-t border-gray-200">
             <Link 
               to="/blog" 
               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
@@ -653,6 +714,7 @@ const Post1 = () => {
               Back to all blogs
             </Link>
           </div>
+          </section>
         </div>
       </div>
     </>

@@ -6,7 +6,39 @@ const AboutContactPage: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>About ColorCura – Our Mission & Team</title>
+        <meta name="description" content="Learn about ColorCura, our mission to empower designers and developers with beautiful, accessible color palettes, and the team behind the project." />
+        <meta name="keywords" content="about colorcura, colorcura team, colorcura mission, color palettes, web design, accessibility" />
         <link rel="canonical" href="https://www.colorcura.site/about" />
+        {/* Open Graph */}
+        <meta property="og:title" content="About ColorCura – Our Mission & Team" />
+        <meta property="og:description" content="Learn about ColorCura, our mission to empower designers and developers with beautiful, accessible color palettes, and the team behind the project." />
+         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/about" />
+        <meta property="og:type" content="website" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About ColorCura – Our Mission & Team" />
+        <meta name="twitter:description" content="Learn about ColorCura, our mission to empower designers and developers with beautiful, accessible color palettes, and the team behind the project." />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/colorcura-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "name": "About ColorCura",
+            "url": "https://www.colorcura.site/about",
+            "description": "Learn about ColorCura, our mission to empower designers and developers with beautiful, accessible color palettes, and the team behind the project.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            }
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 relative overflow-hidden">

@@ -698,7 +698,39 @@ const PaletteDetailPage: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>Palette Details – ColorCura: Preview & Copy Color Palettes</title>
+        <meta name="description" content="View detailed color palettes, preview them in real UI mockups, and copy hex codes instantly. Perfect for designers and developers seeking inspiration and practical color solutions." />
+        <meta name="keywords" content="palette details, colorcura, color palette, hex codes, UI mockup, color inspiration, web design" />
         <link rel="canonical" href={`https://www.colorcura.site/palette/${id}`} />
+        {/* Open Graph */}
+        <meta property="og:title" content="Palette Details – ColorCura: Preview & Copy Color Palettes" />
+        <meta property="og:description" content="View detailed color palettes, preview them in real UI mockups, and copy hex codes instantly. Perfect for designers and developers seeking inspiration and practical color solutions." />
+        <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content={`https://www.colorcura.site/palette/${id}`} />
+        <meta property="og:type" content="website" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Palette Details – ColorCura: Preview & Copy Color Palettes" />
+        <meta name="twitter:description" content="View detailed color palettes, preview them in real UI mockups, and copy hex codes instantly. Perfect for designers and developers seeking inspiration and practical color solutions." />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/colorcura-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Palette Details – ColorCura",
+            "url": `https://www.colorcura.site/palette/${id}`,
+            "description": "View detailed color palettes, preview them in real UI mockups, and copy hex codes instantly. Perfect for designers and developers seeking inspiration and practical color solutions.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            }
+          })}
+        </script>
       </Helmet>
       <div className="px-4 py-8 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 text-gray-900">
         <div className="container mx-auto space-y-8">

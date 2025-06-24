@@ -279,7 +279,44 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>ColorCura – Curated Color Palettes & UI Mockups for Modern Web Design</title>
+        <meta name="description" content="Discover stunning color palettes for websites and apps. Instantly preview palettes in real UI mockups, copy hex codes, and find the perfect color scheme for your next project. Free, fast, and modern." />
+        <meta name="keywords" content="color palettes, website color schemes, UI colors, color generator, colorcura, web design, hex codes, palette preview, color mockup" />
         <link rel="canonical" href="https://www.colorcura.site/" />
+        {/* Open Graph */}
+        <meta property="og:title" content="ColorCura – Curated Color Palettes & UI Mockups for Modern Web Design" />
+        <meta property="og:description" content="Browse trending color palettes and preview them in real UI mockups. Perfect for designers, developers, and brands." />
+        <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/" />
+        <meta property="og:type" content="website" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="ColorCura – Curated Color Palettes & UI Mockups" />
+        <meta name="twitter:description" content="Browse trending color palettes and preview them in real UI mockups. Perfect for designers, developers, and brands." />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/colorcura-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "ColorCura",
+            "url": "https://www.colorcura.site/",
+            "description": "Discover stunning color palettes for websites and apps. Instantly preview palettes in real UI mockups, copy hex codes, and find the perfect color scheme for your next project.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://www.colorcura.site/?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         <div className="relative min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50 overflow-x-hidden">

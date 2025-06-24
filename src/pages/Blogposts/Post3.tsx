@@ -6,7 +6,48 @@ const Post3: React.FC = () => {
   return (
     <>
       <Helmet>
+        <title>Complete Guide to CSS Gradients (Linear, Radial, Conic) for Modern Web Design</title>
+        <meta name="description" content="Master CSS gradients with this comprehensive guide. Learn linear, radial, and conic gradients, syntax, real-world examples, and best practices for stunning web design." />
+        <meta name="keywords" content="css gradients, linear gradient, radial gradient, conic gradient, web design, css tricks, background, modern css, design guide" />
         <link rel="canonical" href="https://www.colorcura.site/blog/css-gradients-guide" />
+        {/* Open Graph */}
+        <meta property="og:title" content="Complete Guide to CSS Gradients (Linear, Radial, Conic) for Modern Web Design" />
+        <meta property="og:description" content="Master CSS gradients with this comprehensive guide. Syntax, examples, and best practices for web designers." />
+         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
+        <meta property="og:url" content="https://www.colorcura.site/blog/css-gradients-guide" />
+        <meta property="og:type" content="article" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Complete Guide to CSS Gradients (Linear, Radial, Conic)" />
+        <meta name="twitter:description" content="Master CSS gradients with this comprehensive guide. Syntax, examples, and best practices for web designers." />
+        <meta name="twitter:image" content="https://www.colorcura.site/images/css-gradients-twitter.jpg" />
+        {/* Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "Complete Guide to CSS Gradients (Linear, Radial, Conic) for Modern Web Design",
+            "description": "Master CSS gradients with this comprehensive guide. Learn linear, radial, and conic gradients, syntax, real-world examples, and best practices for stunning web design.",
+            "author": {
+              "@type": "Organization",
+              "name": "ColorCura"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ColorCura",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.colorcura.site/logo.png"
+              }
+            },
+            "datePublished": "2025-03-22",
+            "dateModified": "2025-03-22",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://www.colorcura.site/blog/css-gradients-guide"
+            }
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         {/* Header Image */}
