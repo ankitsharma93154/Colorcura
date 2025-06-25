@@ -20,10 +20,10 @@ interface ColorSwatchProps {
 }
 
 const ColorSwatch = React.memo(({ color, label }: ColorSwatchProps) => {
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
-  const handleClick = async () => {
+  // UseCallback for stable handler
+  const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(color);
       setCopied(true);
@@ -31,28 +31,44 @@ const ColorSwatch = React.memo(({ color, label }: ColorSwatchProps) => {
     } catch (err) {
       console.error('Failed to copy color code');
     }
-  };
+  }, [color]);
+
+  // Keyboard accessibility: Enter/Space triggers copy
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCopy();
+      }
+    },
+    [handleCopy]
+  );
 
   return (
     <div
-      className="flex-1 h-16 relative cursor-pointer transition-all duration-300 hover:scale-105 hover:z-10 hover:shadow-lg"
+      className="flex-1 h-16 relative cursor-pointer transition-all duration-300 hover:scale-105 hover:z-10 focus:scale-105 focus:z-10 focus:shadow-lg hover:shadow-lg outline-none"
       style={{ backgroundColor: color }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
+      onClick={handleCopy}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Copy ${label} (${color})`}
+      aria-pressed={copied}
       title={`Click to copy ${color}`}
     >
-      {(isHovered || copied) && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center transition-all duration-200">
-          <div className="text-white text-xs font-mono text-center">
-            <div className="font-semibold">{label}</div>
-            <div className="mb-1">{color}</div>
-            <div className="text-xs opacity-75">
-              {copied ? '✓ Copied!' : 'Click to copy'}
-            </div>
+      {/* Overlay using CSS :hover/:focus, but show feedback if copied */}
+      <div
+        className={`absolute inset-0 flex items-center justify-center transition-all duration-200 pointer-events-none ${copied ? 'bg-black bg-opacity-70' : 'opacity-0 hover:opacity-100 focus:opacity-100 bg-black bg-opacity-60'}`}
+        aria-live={copied ? 'polite' : undefined}
+      >
+        <div className="text-white text-xs font-mono text-center">
+          <div className="font-semibold">{label}</div>
+          <div className="mb-1">{color}</div>
+          <div className="text-xs opacity-75">
+            {copied ? '✓ Copied!' : 'Click or press Enter/Space to copy'}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 });
