@@ -388,18 +388,31 @@ const FontSelector: React.FC<FontSelectorProps> = React.memo(({ currentFont, onF
 });
 
 // Helper to format date
-const formatDate = (timestamp: number | undefined): string => {
-  if (timestamp === undefined || timestamp === null) return 'N/A';
-  try {
-    const numericTimestamp = Number(timestamp);
-    if (isNaN(numericTimestamp)) return 'Invalid Date';
-    return new Date(numericTimestamp).toLocaleDateString(undefined, {
+const formatDate = (input: number | string | undefined): string => {
+  if (input === undefined || input === null) return 'N/A';
+  let dateObj: Date | null = null;
+  if (typeof input === 'number') {
+    // Treat as timestamp
+    dateObj = new Date(input);
+  } else if (typeof input === 'string') {
+    // Try ISO string first
+    const isoDate = new Date(input);
+    if (!isNaN(isoDate.getTime())) {
+      dateObj = isoDate;
+    } else {
+      // Try as numeric string
+      const num = Number(input);
+      if (!isNaN(num)) {
+        dateObj = new Date(num);
+      }
+    }
+  }
+  if (dateObj && !isNaN(dateObj.getTime())) {
+    return dateObj.toLocaleDateString(undefined, {
       year: 'numeric', month: 'short', day: 'numeric'
     });
-  } catch (e) {
-    console.error("Error formatting date:", e);
-    return 'Invalid Date';
   }
+  return 'Invalid Date';
 };
 
 const PaletteDetailPage: React.FC = () => {
@@ -692,8 +705,8 @@ const PaletteDetailPage: React.FC = () => {
   }
 
   const downloadCount = palette.downloads_count ?? 0;
-  const creationDateTimestamp = palette.created_at ? Number(palette.created_at) : undefined;
-  const validCreationDate = creationDateTimestamp && !isNaN(creationDateTimestamp) ? creationDateTimestamp : undefined;
+  // Support both ISO string and timestamp for created_at
+  const validCreationDate = palette.created_at ?? undefined;
 
   return (
     <>
@@ -1009,154 +1022,230 @@ const PaletteDetailPage: React.FC = () => {
               </div>
 
               {/* Modal Content - 2 Column Responsive Layout */}
-              {!showColorPicker ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                  {/* Left: Suggested Colors + Custom Picker Button */}
-                  <div className="flex flex-col ">
-                    <div>
-                      <h4 className="text-xs font-medium text-gray-700 mb-1">Suggested Colors</h4>
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4">
-                        {[...palette.hex_codes.slice(0, 4), "#FFFFFF", "#000000"].map((color, index) => (
-                          <button
-                            key={index}
-                            className={`h-14 w-full rounded border border-gray-300 hover:opacity-80 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${color === "#FFFFFF" ? "shadow-inner" : ""} ${color === "#000000" ? "shadow-inner" : ""}`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => handlePresetColorSelect(color)}
-                            aria-label={`Select color ${color} for ${selectedRole}`}
-                            title={color}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setShowColorPicker(true)}
-                      className="w-full p-2 border-2 border-dashed border-gray-300 rounded hover:border-indigo-400 hover:bg-indigo-50 text-xs text-gray-600 hover:text-indigo-600 transition-colors"
-                    >
-                      + Choose Custom Color
-                    </button>
-                  </div>
-                  {/* Right: FontSelector (if text role) + Preview (symmetrical height) */}
-                  <div className="flex flex-col h-full justify-between">
-                    {isTextRole && (
-                      <div className="mb-2">
-                        <FontSelector
-                          currentFont={selectedFont}
-                          onFontChange={handleFontChange}
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 flex flex-col justify-center">
-                      <h4 className="text-xs font-medium text-gray-700 mb-1">Preview</h4>
-                      <div className="p-2 border border-gray-200 rounded bg-gray-50 flex items-center justify-center h-16">
-                        <div
-                          className="w-full h-12 rounded border flex items-center justify-center text-xs font-medium transition-all duration-200"
-                          style={{
-                            backgroundColor: !isTextRole
-                              ? (selectedRole ? colorRoles[selectedRole] : '#ffffff')
-                              : '#f3f4f6',
-                            color: isTextRole
-                              ? (selectedRole ? colorRoles[selectedRole] : '#000000')
-                              : ((selectedRole ? colorRoles[selectedRole] : '#ffffff') === '#ffffff' ? '#374151' : '#ffffff'),
-                            fontFamily: isTextRole
-                              ? (selectedFont === 'Inter'
-                                  ? "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
-                                  : `${selectedFont}, sans-serif`)
-                              : 'inherit'
-                          }}
-                        >
-                          {selectedRole.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Preview
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end mt-4">
-                      <button
-                        onClick={() => {
-                          setSelectedRole(null);
-                          setShowColorPicker(false);
-                        }}
-                        className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 rounded shadow transition-colors border border-gray-300"
-                      >
-                        Done
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                  {/* Left: Color Picker */}
-                  <div className="flex flex-col h-full justify-between">
-                    <ColorPicker
-                      ref={colorPickerRef}
-                      initialColor={tempColor}
-                      onLiveColorChange={setLivePickerColor}
-                    />
-                  </div>
-                  {/* Right: FontSelector (if text role), Suggested Colors, Preview, Actions */}
-                  <div className="flex flex-col h-full justify-between">
-                    {isTextRole && (
-                      <div className="mb-2">
-                        <FontSelector
-                          currentFont={selectedFont}
-                          onFontChange={handleFontChange}
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-xs font-medium text-gray-700 mb-1">Suggested Colors</h4>
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4">
-                        {[...palette.hex_codes.slice(0, 4), "#FFFFFF", "#000000"].map((color, index) => (
-                          <button
-                            key={index}
-                            className={`h-8 w-full rounded border border-gray-300 hover:opacity-80 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${color === "#FFFFFF" ? "shadow-inner" : ""} ${color === "#000000" ? "shadow-inner" : ""}`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => handlePresetColorSelect(color)}
-                            aria-label={`Select color ${color} for ${selectedRole}`}
-                            title={color}
-                          />
-                        ))}
-                      </div>
-                      <h4 className="text-xs font-medium text-gray-700 mb-1">Preview</h4>
-                      <div className="p-2 border border-gray-200 rounded bg-gray-50 flex items-center justify-center h-16 mb-2">
-                        <div
-                          className="w-full h-12 rounded border flex items-center justify-center text-xs font-medium transition-all duration-200"
-                          style={{
-                            backgroundColor: !isTextRole
-                              ? (showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#ffffff'))
-                              : '#f3f4f6',
-                            color: isTextRole
-                              ? (showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#000000'))
-                              : ((showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#ffffff')) === '#ffffff' ? '#374151' : '#ffffff'),
-                            fontFamily: isTextRole
-                              ? (selectedFont === 'Inter'
-                                  ? "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
-                                  : `${selectedFont}, sans-serif`)
-                              : 'inherit'
-                          }}
-                        >
-                          {selectedRole.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Preview
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
-                      <button
-                        onClick={() => {
-                          setSelectedRole(null);
-                          setShowColorPicker(false);
-                        }}
-                        className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 rounded shadow transition-colors border border-gray-300"
-                      >
-                        Done
-                      </button>
-                      <button
-                        onClick={handleApplyCustomColor}
-                        className="px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition-colors border border-indigo-700"
-                      >
-                        Apply Changes
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Enhanced Modal Content - 2 Column Responsive Layout */}
+{/* Enhanced Modal Content - 2 Column Responsive Layout */}
+{!showColorPicker ? (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+    {/* Left: Suggested Colors + Custom Picker Button */}
+    <div className="flex flex-col space-y-4">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+          <h4 className="text-sm font-semibold text-gray-800">Suggested Colors</h4>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          {[...palette.hex_codes.slice(0, 4), "#FFFFFF", "#000000"].map((color, index) => (
+            <button
+              key={index}
+              className={`group relative h-16 w-full rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/30 ${
+                color === "#FFFFFF" 
+                  ? "border-gray-200 shadow-inner hover:border-gray-300" 
+                  : color === "#000000"
+                  ? "border-gray-700 shadow-inner hover:border-gray-600"
+                  : "border-transparent hover:border-white/50"
+              }`}
+              style={{ backgroundColor: color }}
+              onClick={() => handlePresetColorSelect(color)}
+              aria-label={`Select color ${color} for ${selectedRole}`}
+              title={color}
+            >
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <button
+        onClick={() => setShowColorPicker(true)}
+        className="group relative w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 text-sm font-medium text-gray-600 hover:text-blue-600 transition-all duration-300 overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="relative flex items-center justify-center gap-2">
+          <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+            <span className="text-white text-xs font-bold">+</span>
+          </div>
+          Choose Custom Color
+        </div>
+      </button>
+    </div>
+
+    {/* Right: FontSelector (if text role) + Preview */}
+    <div className="flex flex-col space-y-4">
+      {isTextRole && (
+        <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <FontSelector
+            currentFont={selectedFont}
+            onFontChange={handleFontChange}
+          />
+        </div>
+      )}
+      
+      <div className="flex-1 flex flex-col justify-center space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+          <h4 className="text-sm font-semibold text-gray-800">Live Preview</h4>
+        </div>
+        
+        <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <div
+            className="w-full h-16 rounded-xl border-2 border-gray-200 flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden"
+            style={{
+              backgroundColor: !isTextRole
+                ? (selectedRole ? colorRoles[selectedRole] : '#ffffff')
+                : '#f9fafb',
+              color: isTextRole
+                ? (selectedRole ? colorRoles[selectedRole] : '#000000')
+                : ((selectedRole ? colorRoles[selectedRole] : '#ffffff') === '#ffffff' ? '#374151' : '#ffffff'),
+              fontFamily: isTextRole
+                ? (selectedFont === 'Inter'
+                    ? "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
+                    : `${selectedFont}, sans-serif`)
+                : 'inherit'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+            <span className="relative z-10">
+              {selectedRole.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Preview
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <button
+          onClick={() => {
+            setSelectedRole(null);
+            setShowColorPicker(false);
+          }}
+          className="group px-6 py-3 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-300 hover:border-gray-400"
+        >
+          <span className="group-hover:scale-105 transition-transform duration-300 inline-block">
+            Done
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+    {/* Left: Color Picker */}
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <button
+          onClick={() => setShowColorPicker(false)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+        <h4 className="text-sm font-semibold text-gray-800">Custom Color Picker</h4>
+      </div>
+      
+      <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+        <ColorPicker
+          ref={colorPickerRef}
+          initialColor={tempColor}
+          onLiveColorChange={setLivePickerColor}
+        />
+      </div>
+    </div>
+
+    {/* Right: FontSelector, Suggested Colors, Preview, Actions */}
+    <div className="flex flex-col space-y-4">
+      {isTextRole && (
+        <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <FontSelector
+            currentFont={selectedFont}
+            onFontChange={handleFontChange}
+          />
+        </div>
+      )}
+      
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+          <h4 className="text-sm font-semibold text-gray-800">Quick Colors</h4>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {[...palette.hex_codes.slice(0, 4), "#FFFFFF", "#000000"].map((color, index) => (
+            <button
+              key={index}
+              className={`group relative h-10 w-full rounded-lg border-2 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500/30 ${
+                color === "#FFFFFF" 
+                  ? "border-gray-200 hover:border-gray-300" 
+                  : color === "#000000"
+                  ? "border-gray-700 hover:border-gray-600"
+                  : "border-transparent hover:border-white/50"
+              }`}
+              style={{ backgroundColor: color }}
+              onClick={() => handlePresetColorSelect(color)}
+              aria-label={`Select color ${color} for ${selectedRole}`}
+              title={color}
+            >
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+          <h4 className="text-sm font-semibold text-gray-800">Live Preview</h4>
+        </div>
+        <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <div
+            className="w-full h-16 rounded-xl border-2 border-gray-200 flex items-center justify-center text-sm font-semibold transition-all duration-300 shadow-sm relative overflow-hidden"
+            style={{
+              backgroundColor: !isTextRole
+                ? (showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#ffffff'))
+                : '#f9fafb',
+              color: isTextRole
+                ? (showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#000000'))
+                : ((showColorPicker ? livePickerColor : (selectedRole ? colorRoles[selectedRole] : '#ffffff')) === '#ffffff' ? '#374151' : '#ffffff'),
+              fontFamily: isTextRole
+                ? (selectedFont === 'Inter'
+                    ? "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
+                    : `${selectedFont}, sans-serif`)
+                : 'inherit'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+            <span className="relative z-10">
+              {selectedRole.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Preview
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+        <button
+          onClick={() => {
+            setSelectedRole(null);
+            setShowColorPicker(false);
+          }}
+          className="group px-6 py-3 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-300 hover:border-gray-400"
+        >
+          <span className="group-hover:scale-105 transition-transform duration-300 inline-block">
+            Cancel
+          </span>
+        </button>
+        <button
+          onClick={handleApplyCustomColor}
+          className="group px-6 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-700 hover:border-purple-700"
+        >
+          <div className="flex items-center gap-2">
+            <span className="group-hover:scale-105 transition-transform duration-300 inline-block">
+              Apply Changes
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
             </div>
           </div>
         )}

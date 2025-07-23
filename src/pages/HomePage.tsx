@@ -289,11 +289,13 @@ const HomePage: React.FC = () => {
         <meta property="og:image" content="https://www.colorcura.site/og-preview.png" />
         <meta property="og:url" content="https://www.colorcura.site/" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="ColorCura" />
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="ColorCura – Curated Color Palettes & UI Mockups" />
         <meta name="twitter:description" content="Browse trending color palettes and preview them in real UI mockups. Perfect for designers, developers, and brands." />
         <meta name="twitter:image" content="https://www.colorcura.site/images/colorcura-twitter.jpg" />
+        <meta name="twitter:site" content="@colorcura" />
         {/* Schema.org markup */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -326,36 +328,67 @@ const HomePage: React.FC = () => {
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-indigo-400/5 to-purple-500/5 rounded-full blur-3xl animate-pulse pointer-events-none z-0" style={{ animationDelay: '4s' }}></div>
 
           <div className="flex flex-1 w-full max-w-[1920px] mx-auto min-h-0">
-            {/* Left Sidebar */}
-            <aside className="hidden md:flex flex-col w-40 min-h-screen border-r border-white/30 bg-white/70 backdrop-blur-xl shadow-xl z-30 fixed left-0 top-20 bottom-0">
-              <div className="p-4 h-full overflow-y-auto scrollbar-hide flex flex-col gap-6">
-                <div>
-                  <h2 className="text-base font-bold mb-3 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">Tags</h2>
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => setActiveFilter(null)}
-                      className={`block w-full text-left px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border
-                        ${!activeFilter ?
-                          'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 scale-105' :
-                          'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow'}
-                  `}
-                    >
-                      All
-                    </button>
-                    {limitedTags.map(tag => (
+            {/* Left Sidebar - Innovative Glassy/Gradient/Animated Tags */}
+            <aside className="hidden md:flex flex-col w-40 min-h-screen border-r border-white/30 bg-white/60 backdrop-blur-xl shadow-lg z-30 fixed left-0 top-20 bottom-0">
+              <div className="p-4 h-full overflow-y-auto scrollbar-hide flex flex-col gap-0">
+                {/* Sidebar Title & Divider */}
+                <div className="mb-2">
+                  <h2 className="text-base font-extrabold mb-1 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-wide flex items-center gap-2">
+                    <span>🎨</span> Tags
+                  </h2>
+                  <div className="h-1 w-10 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-full mb-2" />
+                </div>
+
+                {/* Tag Search Input removed (duplicate) */}
+
+                {/* Animated Tag Pills with Usage Count */}
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => setActiveFilter(null)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+                      ${!activeFilter ?
+                        'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white border-indigo-300 scale-105 shadow-lg' :
+                        'bg-white/70 text-gray-700 border-white/40 hover:bg-white/90'}
+                    `}
+                  >
+                    <span className="text-base">🌈</span> All
+                  </button>
+                  {limitedTags.map((tag, idx) => {
+                    // Assign a unique gradient for each tag for visual variety
+                    const gradients = [
+                      'from-indigo-400 via-purple-400 to-pink-400',
+                      'from-pink-400 via-orange-300 to-yellow-400',
+                      'from-green-400 via-blue-400 to-purple-400',
+                      'from-yellow-400 via-pink-400 to-purple-400',
+                      'from-blue-400 via-cyan-400 to-green-400',
+                      'from-purple-400 via-pink-400 to-orange-400',
+                    ];
+                    const gradient = gradients[idx % gradients.length];
+                    // Find tag usage count
+                    const tagCount = allPalettes.reduce((acc, p) => Array.isArray(p.tags) && p.tags.includes(tag) ? acc + 1 : acc, 0);
+                    return (
                       <button
                         key={tag}
                         onClick={() => setActiveFilter(tag)}
-                        className={`block w-full text-left px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 border
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400/40
                           ${activeFilter === tag ?
-                            'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-indigo-300 scale-105' :
-                            'text-gray-700 hover:bg-white/60 border-white/30 hover:scale-105 hover:shadow'}
-                  `}
+                            `bg-gradient-to-r ${gradient} text-white border-indigo-300 scale-105 shadow-lg animate-gradient-x` :
+                            'bg-white/70 text-gray-700 border-white/40 hover:bg-white/90'}
+                        `}
+                        style={{ backgroundSize: '200% 200%' }}
                       >
-                        {capitalizeFirstLetter(tag)}
+                        <span className="capitalize font-bold tracking-wide">{capitalizeFirstLetter(tag)}</span>
+                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-white/30 text-gray-700 font-semibold border border-white/40 shadow-sm">
+                          {tagCount}
+                        </span>
                       </button>
-                    ))}
-                  </div>
+                    );
+                  })}
+                </div>
+
+                {/* Sidebar Footer or Tip */}
+                <div className="mt-6 text-[11px] text-gray-400 text-center select-none">
+                  <span>Tip: Try searching for "brand", "pastel", or "dark"</span>
                 </div>
               </div>
             </aside>
